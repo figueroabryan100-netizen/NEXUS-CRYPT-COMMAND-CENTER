@@ -1,0 +1,1088 @@
+<!-- ============================================================
+     NEXUS CRYPT V4 // AI COMMAND CENTER
+     Add before </body>
+============================================================ -->
+
+<section id="nexusCommandCenter" class="nexus-v4">
+
+  <div class="nexus-v4-header">
+    <div>
+      <div class="nexus-v4-kicker">NEXUS INTELLIGENCE NETWORK // ONLINE</div>
+      <h1>AI TRADING COMMAND CENTER</h1>
+    </div>
+
+    <div class="nexus-v4-system">
+      <span id="nexusPaperState">● PAPER MODE</span>
+      <span>8 AGENTS</span>
+      <span id="nexusClock">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- COMMAND STRIP -->
+  <div class="nexus-command-strip">
+
+    <div class="nexus-stat">
+      <span>SYSTEM VITALITY</span>
+      <strong id="nexusVitality">100%</strong>
+    </div>
+
+    <div class="nexus-stat">
+      <span>CONSENSUS</span>
+      <strong class="nexus-green" id="nexusConsensus">76.8%</strong>
+    </div>
+
+    <div class="nexus-stat">
+      <span>RISK</span>
+      <strong id="nexusRisk">LOW</strong>
+    </div>
+
+    <div class="nexus-stat">
+      <span>EXPOSURE</span>
+      <strong id="nexusExposure">0%</strong>
+    </div>
+
+    <div class="nexus-stat">
+      <span>ACTIVE SIGNALS</span>
+      <strong id="nexusSignals">0</strong>
+    </div>
+
+    <button id="nexusEmergency" class="nexus-danger">
+      KILL SWITCH
+    </button>
+
+  </div>
+
+
+  <!-- MAIN COMMAND GRID -->
+  <div class="nexus-command-grid">
+
+    <!-- ================= SWARM ================= -->
+    <section class="nexus-card nexus-agents">
+
+      <div class="nexus-card-title">
+        <span>THE SWARM</span>
+        <small>DECISION NETWORK</small>
+      </div>
+
+      <div class="nexus-agent-grid">
+
+        <article class="nexus-agent" data-agent="VESKA">
+          <div class="agent-icon">V</div>
+          <div>
+            <strong>VESKA</strong>
+            <small>EXECUTION</small>
+          </div>
+          <b class="agent-decision">READY</b>
+          <div class="agent-meter"><i style="width:92%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="NORO">
+          <div class="agent-icon">N</div>
+          <div>
+            <strong>NORO</strong>
+            <small>FAIR VALUE</small>
+          </div>
+          <b class="agent-decision">BUY</b>
+          <div class="agent-meter"><i style="width:88%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="LUMEN">
+          <div class="agent-icon">L</div>
+          <div>
+            <strong>LUMEN</strong>
+            <small>SENTIMENT</small>
+          </div>
+          <b class="agent-decision">BULLISH</b>
+          <div class="agent-meter"><i style="width:81%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="TIDAL">
+          <div class="agent-icon">T</div>
+          <div>
+            <strong>TIDAL</strong>
+            <small>SCANNER</small>
+          </div>
+          <b class="agent-decision">FOUND</b>
+          <div class="agent-meter"><i style="width:95%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="ZEPHR">
+          <div class="agent-icon">Z</div>
+          <div>
+            <strong>ZEPHR</strong>
+            <small>LIQUIDITY</small>
+          </div>
+          <b class="agent-decision">PASS</b>
+          <div class="agent-meter"><i style="width:74%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="RUNE">
+          <div class="agent-icon">R</div>
+          <div>
+            <strong>RUNE</strong>
+            <small>RISK</small>
+          </div>
+          <b class="agent-decision">PASS</b>
+          <div class="agent-meter"><i style="width:91%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="OKAPI">
+          <div class="agent-icon">O</div>
+          <div>
+            <strong>OKAPI</strong>
+            <small>EXPOSURE</small>
+          </div>
+          <b class="agent-decision">CLEAR</b>
+          <div class="agent-meter"><i style="width:86%"></i></div>
+        </article>
+
+        <article class="nexus-agent" data-agent="MARIN">
+          <div class="agent-icon">M</div>
+          <div>
+            <strong>MARIN</strong>
+            <small>LIQUIDATION</small>
+          </div>
+          <b class="agent-decision">STANDBY</b>
+          <div class="agent-meter"><i style="width:79%"></i></div>
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= WAR ROOM ================= -->
+    <section class="nexus-card nexus-warroom">
+
+      <div class="nexus-card-title">
+        <span>WAR ROOM</span>
+        <small>CONSENSUS ENGINE</small>
+      </div>
+
+      <div class="nexus-consensus">
+
+        <div class="nexus-ring">
+          <div>
+            <strong id="nexusConsensusBig">76.8%</strong>
+            <small>CONSENSUS</small>
+          </div>
+        </div>
+
+        <div class="nexus-vote-count">
+          <strong>6 / 8</strong>
+          <span>AGENTS APPROVE</span>
+        </div>
+
+        <div class="nexus-threshold">
+          <span>EXECUTION THRESHOLD</span>
+          <strong>70%</strong>
+        </div>
+
+      </div>
+
+      <div class="nexus-proposal">
+
+        <div>
+          <span>MARKET</span>
+          <strong id="nexusMarket">BTC / USDT</strong>
+        </div>
+
+        <div>
+          <span>ACTION</span>
+          <strong class="nexus-green">BUY YES</strong>
+        </div>
+
+        <div>
+          <span>MARKET PRICE</span>
+          <strong id="nexusMarketPrice">54¢</strong>
+        </div>
+
+        <div>
+          <span>FAIR VALUE</span>
+          <strong id="nexusFairValue">63¢</strong>
+        </div>
+
+        <div>
+          <span>EDGE</span>
+          <strong class="nexus-green">+9¢</strong>
+        </div>
+
+      </div>
+
+      <div class="nexus-gate">
+
+        <div class="gate-item passed">
+          <span>✓</span>
+          MARKET SIGNAL
+        </div>
+
+        <div class="gate-item passed">
+          <span>✓</span>
+          FAIR VALUE
+        </div>
+
+        <div class="gate-item passed">
+          <span>✓</span>
+          LIQUIDITY
+        </div>
+
+        <div class="gate-item passed">
+          <span>✓</span>
+          EXPOSURE
+        </div>
+
+        <div class="gate-item passed">
+          <span>✓</span>
+          RISK
+        </div>
+
+        <div class="gate-item waiting">
+          <span>!</span>
+          HUMAN CONFIRMATION
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= VAULT ================= -->
+    <section class="nexus-card">
+
+      <div class="nexus-card-title">
+        <span>THE VAULT</span>
+        <small>CAPITAL INTELLIGENCE</small>
+      </div>
+
+      <div class="nexus-vault-grid">
+
+        <div>
+          <span>EQUITY</span>
+          <strong id="nexusEquity">$0</strong>
+        </div>
+
+        <div>
+          <span>CASH</span>
+          <strong id="nexusCash">$0</strong>
+        </div>
+
+        <div>
+          <span>POSITION</span>
+          <strong id="nexusPosition">0</strong>
+        </div>
+
+        <div>
+          <span>P&amp;L</span>
+          <strong id="nexusPnL">$0</strong>
+        </div>
+
+      </div>
+
+      <div class="nexus-risk-bar">
+
+        <div class="risk-label">
+          <span>RISK UTILIZATION</span>
+          <strong id="nexusRiskPercent">8%</strong>
+        </div>
+
+        <div class="risk-track">
+          <i id="nexusRiskBar"></i>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= WATCHTOWER ================= -->
+    <section class="nexus-card nexus-watchtower">
+
+      <div class="nexus-card-title">
+        <span>WATCHTOWER</span>
+        <small>OPPORTUNITY SCANNER</small>
+      </div>
+
+      <div class="nexus-market-table">
+
+        <div class="market-row market-head">
+          <span>MARKET</span>
+          <span>PRICE</span>
+          <span>FAIR</span>
+          <span>EDGE</span>
+          <span>SIGNAL</span>
+        </div>
+
+        <div class="market-row">
+          <span>BTC &gt; $110K</span>
+          <b>54¢</b>
+          <b>63¢</b>
+          <b class="nexus-green">+9¢</b>
+          <em>BUY</em>
+        </div>
+
+        <div class="market-row">
+          <span>ETH &gt; $4K</span>
+          <b>42¢</b>
+          <b>46¢</b>
+          <b>+4¢</b>
+          <em>WATCH</em>
+        </div>
+
+        <div class="market-row">
+          <span>BTC ETF FLOW</span>
+          <b>61¢</b>
+          <b>57¢</b>
+          <b class="nexus-red">-4¢</b>
+          <em>AVOID</em>
+        </div>
+
+        <div class="market-row">
+          <span>FED CUT</span>
+          <b>37¢</b>
+          <b>44¢</b>
+          <b class="nexus-green">+7¢</b>
+          <em>SCAN</em>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= EXECUTION ================= -->
+    <section class="nexus-card nexus-execution">
+
+      <div class="nexus-card-title">
+        <span>EXECUTION BAY</span>
+        <small>VESKA</small>
+      </div>
+
+      <div class="execution-status">
+        <div class="execution-light"></div>
+        <div>
+          <strong>PROPOSAL READY</strong>
+          <span>Human confirmation required</span>
+        </div>
+      </div>
+
+      <div class="execution-order">
+
+        <div>
+          <span>SIDE</span>
+          <strong>BUY</strong>
+        </div>
+
+        <div>
+          <span>CONTRACT</span>
+          <strong>YES</strong>
+        </div>
+
+        <div>
+          <span>COUNT</span>
+          <strong>1</strong>
+        </div>
+
+        <div>
+          <span>LIMIT</span>
+          <strong>54¢</strong>
+        </div>
+
+      </div>
+
+      <div class="nexus-execution-buttons">
+
+        <button id="nexusPaperTrade" class="nexus-primary">
+          CONFIRM PAPER TRADE
+        </button>
+
+        <button id="nexusArmLive" class="nexus-secondary">
+          ARM LIVE
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= DECISION LEDGER ================= -->
+    <section class="nexus-card nexus-ledger">
+
+      <div class="nexus-card-title">
+        <span>DECISION LEDGER</span>
+        <small>TRACE // IMMUTABLE</small>
+      </div>
+
+      <div id="nexusLedger">
+
+        <div class="ledger-event">
+          <time>13:42:08</time>
+          <b>TIDAL</b>
+          detected BTC &gt; $110K opportunity
+        </div>
+
+        <div class="ledger-event">
+          <time>13:42:09</time>
+          <b>NORO</b>
+          fair value recalculated to 63¢
+        </div>
+
+        <div class="ledger-event">
+          <time>13:42:10</time>
+          <b>LUMEN</b>
+          sentiment shifted bullish
+        </div>
+
+        <div class="ledger-event">
+          <time>13:42:11</time>
+          <b>ZEPHR</b>
+          liquidity check passed
+        </div>
+
+        <div class="ledger-event">
+          <time>13:42:12</time>
+          <b>OKAPI</b>
+          portfolio exposure clear
+        </div>
+
+        <div class="ledger-event">
+          <time>13:42:13</time>
+          <b>RUNE</b>
+          risk engine PASS
+        </div>
+
+        <div class="ledger-event">
+          <time>13:42:14</time>
+          <b>VESKA</b>
+          trade proposal generated
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================= TELEMETRY ================= -->
+    <section class="nexus-card nexus-telemetry">
+
+      <div class="nexus-card-title">
+        <span>BLACK BOX</span>
+        <small>LIVE TELEMETRY</small>
+      </div>
+
+      <div id="nexusTelemetry" class="nexus-terminal"></div>
+
+    </section>
+
+  </div>
+
+</section>
+
+
+<script>
+/* ============================================================
+   NEXUS CRYPT V4 // COMMAND CENTER ENGINE
+============================================================ */
+
+(function NexusCommandCenter() {
+
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const agents = [
+    ["VESKA","EXECUTION"],
+    ["NORO","FAIR VALUE"],
+    ["LUMEN","SENTIMENT"],
+    ["TIDAL","SCANNER"],
+    ["ZEPHR","LIQUIDITY"],
+    ["RUNE","RISK"],
+    ["OKAPI","EXPOSURE"],
+    ["MARIN","LIQUIDATION"]
+  ];
+
+  let consensus = 76.8;
+  let activeSignals = 0;
+
+  const telemetryMessages = [
+    ["TIDAL","Scanning market universe"],
+    ["NORO","Recalculating fair-value surface"],
+    ["LUMEN","Monitoring sentiment delta"],
+    ["ZEPHR","Measuring order-book liquidity"],
+    ["OKAPI","Checking correlated exposure"],
+    ["RUNE","Validating position limits"],
+    ["VESKA","Waiting at execution gate"],
+    ["MARIN","Monitoring liquidation routes"]
+  ];
+
+  function now() {
+    return new Date().toLocaleTimeString();
+  }
+
+  function telemetry(agent, message) {
+
+    const terminal = $("nexusTelemetry");
+
+    if (!terminal) return;
+
+    const row = document.createElement("div");
+
+    row.className = "nexus-terminal-line";
+
+    row.innerHTML =
+      `<time>${now()}</time>` +
+      `<b>${agent}</b>` +
+      `<span>${message}</span>`;
+
+    terminal.prepend(row);
+
+    while (terminal.children.length > 40) {
+      terminal.lastElementChild.remove();
+    }
+  }
+
+  function ledger(agent, message) {
+
+    const box = $("nexusLedger");
+
+    if (!box) return;
+
+    const row = document.createElement("div");
+
+    row.className = "ledger-event nexus-new-event";
+
+    row.innerHTML =
+      `<time>${now()}</time>` +
+      `<b>${agent}</b>` +
+      `${message}`;
+
+    box.prepend(row);
+
+    while (box.children.length > 18) {
+      box.lastElementChild.remove();
+    }
+  }
+
+  function pulseAgent(agent) {
+
+    const node =
+      document.querySelector(
+        `.nexus-agent[data-agent="${agent}"]`
+      );
+
+    if (!node) return;
+
+    node.classList.remove("nexus-active");
+
+    void node.offsetWidth;
+
+    node.classList.add("nexus-active");
+  }
+
+  function cycleAgent() {
+
+    const data =
+      telemetryMessages[
+        Math.floor(
+          Math.random() * telemetryMessages.length
+        )
+      ];
+
+    telemetry(data[0], data[1]);
+
+    pulseAgent(data[0]);
+
+    activeSignals =
+      Math.max(
+        0,
+        Math.min(
+          12,
+          activeSignals + (Math.random() > .55 ? 1 : -1)
+        )
+      );
+
+    if ($("nexusSignals")) {
+      $("nexusSignals").textContent =
+        activeSignals;
+    }
+  }
+
+  function updateClock() {
+
+    if ($("nexusClock")) {
+      $("nexusClock").textContent = now();
+    }
+
+  }
+
+  function connectExistingSystem() {
+
+    /*
+      The existing V3 app exposes:
+        window.__CRYPT
+      We intentionally read it instead of replacing
+      the existing Kalshi engine.
+    */
+
+    const crypt = window.__CRYPT;
+
+    if (!crypt) return;
+
+    try {
+
+      if (crypt.portfolio) {
+
+        const p = crypt.portfolio;
+
+        if ($("nexusEquity") && p.equity != null)
+          $("nexusEquity").textContent =
+            typeof p.equity === "number"
+              ? "$" + p.equity.toFixed(2)
+              : p.equity;
+
+        if ($("nexusCash") && p.cash != null)
+          $("nexusCash").textContent =
+            typeof p.cash === "number"
+              ? "$" + p.cash.toFixed(2)
+              : p.cash;
+
+        if ($("nexusPosition"))
+          $("nexusPosition").textContent =
+            p.position ?? 0;
+
+        if ($("nexusPnL") && p.pnl != null)
+          $("nexusPnL").textContent =
+            typeof p.pnl === "number"
+              ? (p.pnl >= 0 ? "+" : "") +
+                "$" +
+                p.pnl.toFixed(2)
+              : p.pnl;
+
+        if ($("nexusExposure") && p.exposure != null)
+          $("nexusExposure").textContent =
+            Math.round(p.exposure) + "%";
+
+      }
+
+      if (crypt.kalshi) {
+
+        const k = crypt.kalshi;
+
+        const live =
+          !!k.tradingEnabled;
+
+        if ($("nexusPaperState")) {
+
+          $("nexusPaperState").textContent =
+            live
+              ? "● LIVE ARMED"
+              : "● PAPER MODE";
+
+          $("nexusPaperState").className =
+            live
+              ? "nexus-live-state"
+              : "";
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.warn(
+        "NEXUS V4 sync error",
+        error
+      );
+
+    }
+
+  }
+
+  function confirmPaper() {
+
+    telemetry(
+      "VESKA",
+      "PAPER ORDER CONFIRMED · BUY 1 YES"
+    );
+
+    ledger(
+      "VESKA",
+      " paper trade confirmed · no live funds"
+    );
+
+    const button = $("nexusPaperTrade");
+
+    if (button) {
+
+      const original =
+        button.textContent;
+
+      button.textContent =
+        "✓ PAPER ORDER CONFIRMED";
+
+      setTimeout(() => {
+        button.textContent =
+          original;
+      }, 2500);
+
+    }
+
+  }
+
+  function armLive() {
+
+    telemetry(
+      "RUNE",
+      "LIVE ARM REQUEST RECEIVED"
+    );
+
+    ledger(
+      "RUNE",
+      " live execution gate requires existing Kalshi controls"
+    );
+
+    /*
+      Do NOT bypass the existing safety architecture.
+      Open the existing Kalshi panel instead.
+    */
+
+    const kalshiPanel =
+      $("kalshiPanel");
+
+    if (kalshiPanel) {
+      kalshiPanel.classList.add("open");
+    }
+
+  }
+
+  function emergency() {
+
+    telemetry(
+      "SYSTEM",
+      "EMERGENCY HALT REQUESTED"
+    );
+
+    ledger(
+      "SYSTEM",
+      " kill switch activated"
+    );
+
+    /*
+      Delegate to the original V3 kill switch.
+    */
+
+    const existing =
+      $("btnKill");
+
+    if (existing) {
+      existing.click();
+    }
+
+  }
+
+  $("nexusPaperTrade")?.addEventListener(
+    "click",
+    confirmPaper
+  );
+
+  $("nexusArmLive")?.addEventListener(
+    "click",
+    armLive
+  );
+
+  $("nexusEmergency")?.addEventListener(
+    "click",
+    emergency
+  );
+
+  setInterval(updateClock, 1000);
+
+  setInterval(cycleAgent, 1800);
+
+  setInterval(connectExistingSystem, 1200);
+
+  agents.forEach(
+    ([agent]) =>
+      telemetry(
+        agent,
+        "agent initialized"
+      )
+  );
+
+  connectExistingSystem();
+
+  console.log(
+    "NEXUS CRYPT V4 COMMAND CENTER ONLINE"
+  );
+
+})();
+</script>
+/* ============================================================
+   NEXUS CRYPT V4 // AI COMMAND CENTER
+============================================================ */
+
+.nexus-v4 {
+  margin: 18px;
+  padding: 18px;
+  border: 1px solid rgba(52,224,160,.18);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(52,224,160,.055),
+      transparent 45%
+    ),
+    #05080b;
+  box-shadow:
+    0 0 80px rgba(0,0,0,.45),
+    inset 0 0 80px rgba(52,224,160,.025);
+}
+
+.nexus-v4-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:14px;
+}
+
+.nexus-v4-kicker {
+  color:#34e0a0;
+  font-size:9px;
+  letter-spacing:2px;
+  margin-bottom:4px;
+}
+
+.nexus-v4 h1 {
+  margin:0;
+  font-family:Orbitron,monospace;
+  font-size:clamp(18px,3vw,30px);
+  letter-spacing:2px;
+}
+
+.nexus-v4-system {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.nexus-v4-system span {
+  border:1px solid #183129;
+  padding:7px 10px;
+  background:#07100d;
+  color:#7f978d;
+  font-size:9px;
+}
+
+#nexusPaperState {
+  color:#34e0a0;
+}
+
+.nexus-live-state {
+  color:#ff5268 !important;
+  border-color:#51202a !important;
+}
+
+.nexus-command-strip {
+  display:grid;
+  grid-template-columns:
+    repeat(5, minmax(100px,1fr))
+    auto;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.nexus-stat {
+  border:1px solid #17242b;
+  background:#080e13;
+  padding:10px;
+}
+
+.nexus-stat span {
+  display:block;
+  color:#60747f;
+  font-size:8px;
+  letter-spacing:1px;
+}
+
+.nexus-stat strong {
+  display:block;
+  margin-top:3px;
+  font-size:16px;
+}
+
+.nexus-green {
+  color:#34e0a0 !important;
+}
+
+.nexus-red {
+  color:#ff5268 !important;
+}
+
+.nexus-danger,
+.nexus-primary,
+.nexus-secondary {
+  border:1px solid #26343c;
+  padding:10px 13px;
+  font-family:inherit;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.nexus-danger {
+  color:#ff5268;
+  background:#16090d;
+  border-color:#57202a;
+}
+
+.nexus-primary {
+  color:#04100b;
+  background:#34e0a0;
+  border-color:#34e0a0;
+}
+
+.nexus-secondary {
+  color:#ffcf65;
+  background:#151005;
+  border-color:#4c3b18;
+}
+
+.nexus-command-grid {
+  display:grid;
+  grid-template-columns:
+    minmax(280px,1fr)
+    minmax(360px,1.5fr)
+    minmax(280px,1fr);
+  gap:10px;
+}
+
+.nexus-card {
+  min-width:0;
+  border:1px solid #16252d;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(12,20,26,.98),
+      rgba(5,9,13,.98)
+    );
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.28);
+}
+
+.nexus-card-title {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 12px;
+  border-bottom:1px solid #14232b;
+  color:#34e0a0;
+  font-family:Orbitron,monospace;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.nexus-card-title small {
+  color:#536771;
+  font-family:inherit;
+  font-size:7px;
+}
+
+.nexus-agents {
+  grid-row:span 2;
+}
+
+.nexus-agent-grid {
+  padding:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.nexus-agent {
+  position:relative;
+  display:grid;
+  grid-template-columns:30px 1fr;
+  align-items:center;
+  column-gap:7px;
+  padding:9px;
+  border:1px solid #14232b;
+  background:#071016;
+  transition:.25s;
+}
+
+.nexus-agent.nexus-active {
+  border-color:#34e0a0;
+  box-shadow:
+    0 0 18px rgba(52,224,160,.14);
+}
+
+.agent-icon {
+  width:27px;
+  height:27px;
+  display:grid;
+  place-items:center;
+  border:1px solid #28423a;
+  color:#34e0a0;
+  font-weight:bold;
+}
+
+.nexus-agent strong {
+  display:block;
+  font-size:10px;
+}
+
+.nexus-agent small {
+  display:block;
+  color:#566c77;
+  font-size:7px;
+}
+
+.agent-decision {
+  position:absolute;
+  right:7px;
+  top:8px;
+  color:#9cb0b9;
+  font-size:7px;
+}
+
+.agent-meter {
+  grid-column:1/-1;
+  height:2px;
+  margin-top:7px;
+  background:#152128;
+}
+
+.agent-meter i {
+  display:block;
+  height:100%;
+  background:#34e0a0;
+  box-shadow:0 0 8px rgba(52,224,160,.5);
+}
+
+.nexus-consensus {
+  padding:18px;
+  display:grid;
+  grid-template-columns:150px 1fr;
+  gap:12px;
+  align-items:center;
+}
+
+.nexus-ring {
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:
+    conic-gradient(
+      #34e0a0 0 76.8%,
+      #142128 76.8% 100%
+    );
+  box-shadow:0 0 35px rgba(52,224,160,.12);
+}
+
+.nexus-ring:after {
+  content:"";
+  position:absolute;
+}
+
+.nexus-ring
