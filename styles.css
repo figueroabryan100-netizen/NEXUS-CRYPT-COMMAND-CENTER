@@ -1,730 +1,815 @@
-/* =========================================================
-
-   NEXUS CRYPT V4 — AI TRADING COMMAND CENTER
-
-   styles.css
-
-   ========================================================= */
+/*
+===========================================================
+NEXUS CRYPT V4
+AI TRADING COMMAND CENTER
+styles.css
+===========================================================
+*/
 
 :root {
-
   --bg: #05070b;
-
   --panel: #0b1018;
-
   --panel-2: #0f1621;
-
   --panel-3: #131c29;
 
   --line: rgba(120, 150, 180, 0.18);
-
   --line-bright: rgba(100, 180, 255, 0.35);
 
   --text: #e8f2ff;
-
   --muted: #8291a5;
 
   --cyan: #37d9ff;
-
   --blue: #4b8dff;
-
   --green: #39e58c;
-
   --yellow: #ffd166;
-
-  --orange: #ff9f43;
-
-  --red: #ff4d6d;
-
-  --purple: #a879ff;
+  --red: #ff5570;
 
   --shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35);
 
-    0 0 25px rgba(55, 217, 255, 0.08),
-
-    inset 0 0 30px rgba(55, 217, 255, 0.025);
-
-  --radius: 12px;
-
-  --font-display: "Orbitron", system-ui, sans-serif;
-
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-
-  --font-ui: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-
+  --radius: 16px;
 }
 
-/* =========================================================
 
+/* ========================================================
    RESET
-
-   ========================================================= */
+======================================================== */
 
 * {
-
   box-sizing: border-box;
-
+  margin: 0;
+  padding: 0;
 }
 
 html {
-
+  background: var(--bg);
+  color-scheme: dark;
   scroll-behavior: smooth;
-
 }
 
 body {
-
-  margin: 0;
-
   min-height: 100vh;
 
   background:
-
-    radial-gradient(circle at 50% -10%, rgba(55, 217, 255, 0.08), transparent 35%),
-
-    radial-gradient(circle at 90% 30%, rgba(168, 121, 255, 0.05), transparent 30%),
-
-    var(--bg);
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(55, 217, 255, 0.10),
+      transparent 35%
+    ),
+    linear-gradient(
+      180deg,
+      #070a10 0%,
+      #05070b 100%
+    );
 
   color: var(--text);
 
-  font-family: var(--font-ui);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 
-  overflow-x: hidden;
-
+  -webkit-font-smoothing: antialiased;
 }
 
-button,
 
-input,
+/* ========================================================
+   APP
+======================================================== */
 
-select,
-
-textarea {
-
-  font: inherit;
-
-}
-
-button {
-
-  cursor: pointer;
-
-}
-
-a {
-
-  color: inherit;
-
-}
-
-/* =========================================================
-
-   NEXUS COMMAND CENTER
-
-   ========================================================= */
-
-#nexusCommandCenter {
-
-  width: 100%;
-
-  max-width: 1800px;
-
+.nexus-app {
+  width: min(1400px, 100%);
   margin: 0 auto;
+  padding: 28px;
 
-  padding: 22px;
-
+  position: relative;
 }
 
-/* =========================================================
 
+/* ========================================================
    HEADER
+======================================================== */
 
-   ========================================================= */
-
-.nexus-v4-header {
-
+.nexus-header {
   display: flex;
-
-  align-items: center;
-
   justify-content: space-between;
+  align-items: flex-end;
 
-  gap: 20px;
+  gap: 24px;
 
-  padding: 18px 20px;
+  padding-bottom: 24px;
 
-  margin-bottom: 14px;
-
-  background: linear-gradient(
-
-    135deg,
-
-    rgba(15, 22, 33, 0.96),
-
-    rgba(8, 12, 19, 0.96)
-
-  );
-
-  border: 1px solid var(--line);
-
-  border-radius: var(--radius);
-
-  box-shadow: var(--shadow);
-
+  border-bottom: 1px solid var(--line);
 }
 
-.nexus-v4-kicker {
+.brand {
+  min-width: 0;
+}
 
+.nexus-kicker {
   color: var(--cyan);
 
-  font-family: var(--font-mono);
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.20em;
+
+  margin-bottom: 8px;
+}
+
+.nexus-header h1 {
+  font-size: clamp(24px, 4vw, 42px);
+
+  line-height: 1.05;
+
+  letter-spacing: -0.03em;
+
+  font-weight: 800;
+}
+
+.nexus-header p {
+  color: var(--muted);
+
+  margin-top: 10px;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
   font-size: 11px;
 
-  letter-spacing: 0.25em;
-
-  text-transform: uppercase;
-
-  margin-bottom: 6px;
-
+  letter-spacing: 0.14em;
 }
 
-.nexus-v4-header h1 {
 
-  margin: 0;
+/* ========================================================
+   SYSTEM STATUS
+======================================================== */
 
-  font-family: var(--font-display);
-
-  font-size: clamp(22px, 3vw, 38px);
-
-  letter-spacing: 0.08em;
-
-  line-height: 1.1;
-
-}
-
-.nexus-v4-system {
-
+.system-status {
   display: flex;
-
   align-items: center;
-
-  justify-content: flex-end;
-
-  flex-wrap: wrap;
 
   gap: 12px;
 
+  flex-wrap: wrap;
+
+  justify-content: flex-end;
+
   color: var(--muted);
 
-  font-family: var(--font-mono);
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
   font-size: 11px;
 
-  text-transform: uppercase;
-
+  white-space: nowrap;
 }
 
-.nexus-v4-system span {
+.status-dot {
+  width: 8px;
+  height: 8px;
 
-  padding: 8px 10px;
+  border-radius: 50%;
 
-  border: 1px solid var(--line);
+  background: var(--green);
 
-  border-radius: 7px;
+  box-shadow:
+    0 0 10px rgba(57, 229, 140, 0.8);
 
-  background: rgba(255, 255, 255, 0.025);
-
+  animation:
+    nexusPulse 1.8s infinite;
 }
 
-#nexusPaperState {
+@keyframes nexusPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 
-  color: var(--green);
-
+  50% {
+    opacity: 0.45;
+    transform: scale(0.75);
+  }
 }
 
-/* =========================================================
 
+/* ========================================================
    COMMAND STRIP
+======================================================== */
 
-   ========================================================= */
-
-.nexus-command-strip {
-
+.command-strip {
   display: grid;
 
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
 
-  gap: 10px;
+  gap: 12px;
 
-  margin-bottom: 14px;
-
+  margin: 18px 0;
 }
 
-.nexus-stat {
-
-  min-height: 76px;
-
-  padding: 14px;
-
-  display: flex;
-
-  flex-direction: column;
-
-  justify-content: space-between;
-
-  background: var(--panel);
+.stat-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 28, 41, 0.95),
+      rgba(8, 12, 18, 0.95)
+    );
 
   border: 1px solid var(--line);
 
   border-radius: var(--radius);
 
+  padding: 18px;
+
   box-shadow: var(--shadow);
 
+  position: relative;
+
+  overflow: hidden;
 }
 
-.nexus-stat span {
+.stat-card::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--cyan),
+      transparent
+    );
+
+  opacity: 0.4;
+}
+
+.stat-card span {
+  display: block;
 
   color: var(--muted);
 
-  font-family: var(--font-mono);
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
   font-size: 10px;
 
   letter-spacing: 0.12em;
 
+  margin-bottom: 8px;
 }
 
-.nexus-stat strong {
+.stat-card strong {
+  display: block;
 
-  font-family: var(--font-display);
+  font-size: 24px;
 
-  font-size: 22px;
-
-  letter-spacing: 0.05em;
-
+  letter-spacing: -0.02em;
 }
 
-.nexus-green {
 
-  color: var(--green) !important;
-
-}
-
-.nexus-red {
-
-  color: var(--red) !important;
-
-}
-
-.nexus-cyan {
-
-  color: var(--cyan) !important;
-
-}
-
-.nexus-yellow {
-
-  color: var(--yellow) !important;
-
-}
-
-/* =========================================================
-
-   MAIN GRID
-
-   ========================================================= */
-
-.nexus-v4-grid {
-
-  display: grid;
-
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
-
-  gap: 14px;
-
-}
-
-.nexus-v4-main,
-
-.nexus-v4-side {
-
-  min-width: 0;
-
-}
-
-.nexus-v4-side {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 14px;
-
-}
-
-/* =========================================================
-
+/* ========================================================
    PANELS
+======================================================== */
 
-   ========================================================= */
-
-.nexus-panel {
-
-  position: relative;
-
+.panel {
   background:
-
     linear-gradient(
-
       145deg,
-
-      rgba(17, 25, 37, 0.97),
-
-      rgba(7, 11, 17, 0.97)
-
+      rgba(15, 22, 33, 0.96),
+      rgba(7, 11, 17, 0.96)
     );
 
   border: 1px solid var(--line);
 
   border-radius: var(--radius);
 
+  padding: 20px;
+
+  margin-bottom: 16px;
+
   box-shadow: var(--shadow);
 
   overflow: hidden;
-
 }
 
-.nexus-panel::before {
+.panel-header {
+  display: flex;
 
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 16px;
+
+  margin-bottom: 18px;
+}
+
+.panel-kicker {
+  color: var(--cyan);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+
+  letter-spacing: 0.16em;
+}
+
+.panel h2 {
+  font-size: 18px;
+
+  margin-top: 5px;
+
+  letter-spacing: -0.01em;
+}
+
+
+/* ========================================================
+   MARKET
+======================================================== */
+
+.market-panel {
+  border-color:
+    rgba(55, 217, 255, 0.20);
+}
+
+.signal-badge {
+  border: 1px solid
+    rgba(57, 229, 140, 0.35);
+
+  background:
+    rgba(57, 229, 140, 0.08);
+
+  color: var(--green);
+
+  border-radius: 999px;
+
+  padding: 7px 13px;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.10em;
+}
+
+.market-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.market-value {
+  padding: 14px;
+
+  background:
+    rgba(5, 8, 13, 0.65);
+
+  border: 1px solid var(--line);
+
+  border-radius: 12px;
+}
+
+.market-value span {
+  display: block;
+
+  color: var(--muted);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 9px;
+
+  letter-spacing: 0.10em;
+
+  margin-bottom: 7px;
+}
+
+.market-value strong {
+  display: block;
+
+  font-size: 17px;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+}
+
+
+/* ========================================================
+   AGENTS
+======================================================== */
+
+.agent-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.agent-card {
+  position: relative;
+
+  padding: 16px;
+
+  min-height: 118px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 28, 41, 0.95),
+      rgba(7, 11, 17, 0.95)
+    );
+
+  border: 1px solid var(--line);
+
+  border-radius: 13px;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.agent-card:hover {
+  transform: translateY(-2px);
+
+  border-color:
+    var(--line-bright);
+
+  box-shadow:
+    0 10px 30px
+    rgba(55, 217, 255, 0.08);
+}
+
+.agent-card::before {
   content: "";
 
   position: absolute;
 
-  inset: 0;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
 
-  pointer-events: none;
+  width: 2px;
 
-  background:
+  background: var(--cyan);
 
-    linear-gradient(
+  opacity: 0.65;
 
-      90deg,
-
-      transparent 49.5%,
-
-      rgba(55, 217, 255, 0.025) 50%,
-
-      transparent 50.5%
-
-    );
-
-  opacity: 0.35;
-
+  border-radius: 4px;
 }
 
-.nexus-panel-header {
+.agent-name {
+  display: block;
 
-  display: flex;
+  color: var(--text);
 
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 14px 16px;
-
-  border-bottom: 1px solid var(--line);
-
-  background: rgba(255, 255, 255, 0.018);
-
-}
-
-.nexus-panel-header h2,
-
-.nexus-panel-header h3 {
-
-  margin: 0;
-
-  font-family: var(--font-display);
-
-  font-size: 13px;
-
-  letter-spacing: 0.12em;
-
-  text-transform: uppercase;
-
-}
-
-.nexus-panel-body {
-
-  padding: 16px;
-
-}
-
-/* =========================================================
-
-   AGENT SWARM
-
-   ========================================================= */
-
-.nexus-agent-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  gap: 10px;
-
-}
-
-.nexus-agent {
-
-  position: relative;
-
-  padding: 14px;
-
-  background: rgba(255, 255, 255, 0.025);
-
-  border: 1px solid var(--line);
-
-  border-radius: 10px;
-
-  transition:
-
-    transform 0.2s ease,
-
-    border-color 0.2s ease,
-
-    box-shadow 0.2s ease;
-
-}
-
-.nexus-agent:hover {
-
-  transform: translateY(-2px);
-
-  border-color: var(--line-bright);
-
-  box-shadow: 0 0 22px rgba(55, 217, 255, 0.08);
-
-}
-
-.nexus-agent-name {
-
-  font-family: var(--font-display);
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
   font-size: 15px;
 
   font-weight: 800;
 
   letter-spacing: 0.08em;
-
 }
 
-.nexus-agent-role {
-
-  margin-top: 5px;
+.agent-role {
+  display: block;
 
   color: var(--muted);
 
-  font-family: var(--font-mono);
+  font-size: 9px;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  letter-spacing: 0.10em;
+
+  margin-top: 5px;
+
+  margin-bottom: 15px;
+}
+
+.agent-card strong {
+  display: block;
+
+  color: var(--green);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 11px;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* ========================================================
+   CYCLE
+======================================================== */
+
+.cycle-counter {
+  color: var(--muted);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+
+  letter-spacing: 0.1em;
+}
+
+.cycle-counter strong {
+  color: var(--cyan);
+
+  margin-left: 6px;
+
+  font-size: 16px;
+}
+
+
+/* ========================================================
+   POSITION
+======================================================== */
+
+.position-status {
+  color: var(--yellow);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+.position-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.position-grid > div {
+  padding: 16px;
+
+  background:
+    rgba(5, 8, 13, 0.65);
+
+  border: 1px solid var(--line);
+
+  border-radius: 12px;
+}
+
+.position-grid span {
+  display: block;
+
+  color: var(--muted);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
   font-size: 9px;
 
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 
-  text-transform: uppercase;
-
+  margin-bottom: 7px;
 }
 
-.nexus-agent-status {
+.position-grid strong {
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
+  font-size: 15px;
+}
+
+
+/* ========================================================
+   TRADE CONTROLS
+======================================================== */
+
+.trade-controls {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+
+  margin-top: 16px;
+}
+
+.trade-button {
+  border: 1px solid var(--line);
+
+  border-radius: 10px;
+
+  padding: 13px 10px;
+
+  color: var(--text);
+
+  background:
+    rgba(19, 28, 41, 0.8);
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.trade-button:hover {
+  transform: translateY(-1px);
+}
+
+.trade-button:active {
+  transform: translateY(1px);
+}
+
+.buy-button {
+  color: var(--green);
+
+  border-color:
+    rgba(57, 229, 140, 0.35);
+}
+
+.buy-button:hover {
+  background:
+    rgba(57, 229, 140, 0.10);
+}
+
+.sell-button {
+  color: var(--red);
+
+  border-color:
+    rgba(255, 85, 112, 0.35);
+}
+
+.sell-button:hover {
+  background:
+    rgba(255, 85, 112, 0.10);
+}
+
+.close-button {
+  color: var(--yellow);
+}
+
+.pause-button {
+  color: var(--cyan);
+}
+
+
+/* ========================================================
+   PIPELINE
+======================================================== */
+
+.pipeline {
   display: flex;
 
   align-items: center;
 
-  gap: 7px;
+  justify-content: center;
 
-  margin-top: 13px;
+  flex-wrap: wrap;
 
-  color: var(--green);
-
-  font-family: var(--font-mono);
-
-  font-size: 9px;
-
-  text-transform: uppercase;
-
+  gap: 8px;
 }
 
-.nexus-agent-status::before {
+.pipeline-node {
+  min-width: 130px;
 
-  content: "";
+  text-align: center;
 
-  width: 7px;
+  padding: 13px 16px;
 
-  height: 7px;
+  background:
+    rgba(5, 8, 13, 0.85);
 
-  border-radius: 50%;
+  border: 1px solid
+    rgba(55, 217, 255, 0.20);
 
-  background: currentColor;
+  border-radius: 10px;
 
-  box-shadow: 0 0 10px currentColor;
+  color: var(--cyan);
 
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
 }
 
-.nexus-agent-vote {
-
-  margin-top: 12px;
-
-  font-family: var(--font-display);
-
-  font-size: 19px;
-
-}
-
-.nexus-agent-why {
-
-  margin-top: 8px;
-
+.pipeline-arrow {
   color: var(--muted);
 
-  font-size: 11px;
-
-  line-height: 1.45;
-
+  font-size: 18px;
 }
 
-/* =========================================================
 
-   CONSENSUS ENGINE
+/* ========================================================
+   LEDGER
+======================================================== */
 
-   ========================================================= */
-
-.nexus-consensus {
-
-  margin-top: 14px;
-
-}
-
-.nexus-consensus-number {
-
-  display: flex;
-
-  align-items: baseline;
-
-  justify-content: space-between;
-
-  gap: 10px;
-
-}
-
-.nexus-consensus-number strong {
-
-  font-family: var(--font-display);
-
-  font-size: clamp(34px, 5vw, 58px);
-
-  color: var(--green);
-
-}
-
-.nexus-consensus-number span {
-
-  color: var(--muted);
-
-  font-family: var(--font-mono);
-
-  font-size: 11px;
-
-}
-
-.nexus-consensus-track {
-
-  position: relative;
-
-  width: 100%;
-
-  height: 12px;
-
-  margin-top: 12px;
-
-  overflow: hidden;
-
-  border-radius: 99px;
-
-  background: #18212d;
-
-  border: 1px solid var(--line);
-
-}
-
-.nexus-consensus-fill {
-
-  width: 0%;
-
-  height: 100%;
-
-  background: linear-gradient(
-
-    90deg,
-
-    var(--red),
-
-    var(--yellow),
-
-    var(--green)
-
-  );
-
-  box-shadow: 0 0 18px rgba(57, 229, 140, 0.3);
-
-  transition: width 0.5s ease;
-
-}
-
-.nexus-consensus-threshold {
-
-  position: absolute;
-
-  top: -4px;
-
-  bottom: -4px;
-
-  left: 70%;
-
-  width: 2px;
-
-  background: var(--text);
-
-  opacity: 0.65;
-
-}
-
-/* =========================================================
-
-   WATCHTOWER
-
-   ========================================================= */
-
-.nexus-market-list {
-
+.ledger {
   display: flex;
 
   flex-direction: column;
 
-  gap: 8px;
+  gap: 6px;
 
+  max-height: 420px;
+
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    var(--panel-3)
+    transparent;
 }
 
-.nexus-market {
-
+.ledger-entry {
   display: grid;
 
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns:
+    80px
+    70px
+    150px
+    1fr;
 
   gap: 12px;
 
@@ -732,768 +817,295 @@ a {
 
   padding: 11px 12px;
 
-  background: rgba(255, 255, 255, 0.025);
+  background:
+    rgba(5, 8, 13, 0.60);
 
   border: 1px solid var(--line);
 
-  border-radius: 8px;
+  border-radius: 9px;
 
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size: 10px;
 }
 
-.nexus-market-title {
-
-  min-width: 0;
-
+.ledger-time {
+  color: var(--muted);
 }
 
-.nexus-market-title strong {
+.ledger-entry strong {
+  color: var(--cyan);
+}
 
-  display: block;
+.ledger-entry span {
+  color: var(--text);
+}
+
+.ledger-entry small {
+  color: var(--muted);
 
   overflow: hidden;
-
-  font-family: var(--font-mono);
-
-  font-size: 11px;
 
   text-overflow: ellipsis;
 
   white-space: nowrap;
-
 }
 
-.nexus-market-title span {
 
-  display: block;
+/* ========================================================
+   FOOTER
+======================================================== */
 
-  margin-top: 3px;
-
-  color: var(--muted);
-
-  font-size: 9px;
-
-}
-
-.nexus-market-price {
-
-  font-family: var(--font-display);
-
-  font-size: 14px;
-
-}
-
-.nexus-market-signal {
-
-  min-width: 58px;
-
-  padding: 5px 7px;
-
-  text-align: center;
-
-  border-radius: 5px;
-
-  font-family: var(--font-mono);
-
-  font-size: 9px;
-
-  text-transform: uppercase;
-
-}
-
-/* =========================================================
-
-   VAULT / PORTFOLIO
-
-   ========================================================= */
-
-.nexus-vault-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 9px;
-
-}
-
-.nexus-vault-stat {
-
-  padding: 12px;
-
-  background: rgba(255, 255, 255, 0.025);
-
-  border: 1px solid var(--line);
-
-  border-radius: 8px;
-
-}
-
-.nexus-vault-stat span {
-
-  display: block;
-
-  color: var(--muted);
-
-  font-family: var(--font-mono);
-
-  font-size: 9px;
-
-  text-transform: uppercase;
-
-}
-
-.nexus-vault-stat strong {
-
-  display: block;
-
-  margin-top: 7px;
-
-  font-family: var(--font-display);
-
-  font-size: 17px;
-
-}
-
-/* =========================================================
-
-   EXECUTION BAY
-
-   ========================================================= */
-
-.nexus-execution {
-
-  border-color: rgba(255, 209, 102, 0.25);
-
-}
-
-.nexus-execution-warning {
-
-  padding: 11px 13px;
-
-  margin-bottom: 12px;
-
-  border: 1px solid rgba(255, 209, 102, 0.2);
-
-  border-radius: 8px;
-
-  background: rgba(255, 209, 102, 0.035);
-
-  color: var(--yellow);
-
-  font-family: var(--font-mono);
-
-  font-size: 10px;
-
-  line-height: 1.5;
-
-}
-
-.nexus-execution-actions {
-
+.nexus-footer {
   display: flex;
-
-  gap: 8px;
-
-  flex-wrap: wrap;
-
-}
-
-/* =========================================================
-
-   BUTTONS
-
-   ========================================================= */
-
-.nexus-btn {
-
-  appearance: none;
-
-  padding: 10px 13px;
-
-  border: 1px solid var(--line-bright);
-
-  border-radius: 7px;
-
-  background: rgba(55, 217, 255, 0.06);
-
-  color: var(--text);
-
-  font-family: var(--font-mono);
-
-  font-size: 10px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.06em;
-
-  text-transform: uppercase;
-
-  transition:
-
-    background 0.2s ease,
-
-    border-color 0.2s ease,
-
-    transform 0.2s ease;
-
-}
-
-.nexus-btn:hover {
-
-  background: rgba(55, 217, 255, 0.13);
-
-  border-color: var(--cyan);
-
-}
-
-.nexus-btn:active {
-
-  transform: scale(0.97);
-
-}
-
-.nexus-btn-primary {
-
-  background: rgba(57, 229, 140, 0.08);
-
-  border-color: rgba(57, 229, 140, 0.35);
-
-}
-
-.nexus-btn-danger {
-
-  background: rgba(255, 77, 109, 0.08);
-
-  border-color: rgba(255, 77, 109, 0.35);
-
-  color: var(--red);
-
-}
-
-/* =========================================================
-
-   DECISION LEDGER
-
-   ========================================================= */
-
-.nexus-ledger {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 7px;
-
-  max-height: 320px;
-
-  overflow-y: auto;
-
-}
-
-.nexus-ledger-entry {
-
-  display: grid;
-
-  grid-template-columns: 75px 1fr auto;
-
-  gap: 10px;
-
-  align-items: center;
-
-  padding: 9px 10px;
-
-  border-left: 2px solid var(--cyan);
-
-  background: rgba(255, 255, 255, 0.025);
-
-  font-family: var(--font-mono);
-
-  font-size: 9px;
-
-}
-
-.nexus-ledger-time {
-
-  color: var(--muted);
-
-}
-
-.nexus-ledger-action {
-
-  color: var(--text);
-
-}
-
-.nexus-ledger-result {
-
-  text-transform: uppercase;
-
-}
-
-/* =========================================================
-
-   TELEMETRY / BLACK BOX
-
-   ========================================================= */
-
-.nexus-telemetry {
-
-  display: grid;
-
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 8px;
-
-}
-
-.nexus-telemetry-card {
-
-  padding: 11px;
-
-  background: rgba(255, 255, 255, 0.025);
-
-  border: 1px solid var(--line);
-
-  border-radius: 8px;
-
-}
-
-.nexus-telemetry-card span {
-
-  display: block;
-
-  color: var(--muted);
-
-  font-family: var(--font-mono);
-
-  font-size: 8px;
-
-  text-transform: uppercase;
-
-}
-
-.nexus-telemetry-card strong {
-
-  display: block;
-
-  margin-top: 6px;
-
-  font-family: var(--font-display);
-
-  font-size: 16px;
-
-}
-
-/* =========================================================
-
-   SIGNAL COLORS
-
-   ========================================================= */
-
-.signal-buy,
-
-.buy {
-
-  color: var(--green);
-
-  background: rgba(57, 229, 140, 0.08);
-
-  border-color: rgba(57, 229, 140, 0.25);
-
-}
-
-.signal-sell,
-
-.sell {
-
-  color: var(--red);
-
-  background: rgba(255, 77, 109, 0.08);
-
-  border-color: rgba(255, 77, 109, 0.25);
-
-}
-
-.signal-watch,
-
-.watch {
-
-  color: var(--yellow);
-
-  background: rgba(255, 209, 102, 0.08);
-
-  border-color: rgba(255, 209, 102, 0.25);
-
-}
-
-/* =========================================================
-
-   KILL SWITCH
-
-   ========================================================= */
-
-.nexus-kill-switch {
-
-  display: flex;
-
-  align-items: center;
 
   justify-content: space-between;
 
-  gap: 15px;
+  gap: 16px;
 
-  padding: 14px;
-
-  border: 1px solid rgba(255, 77, 109, 0.28);
-
-  border-radius: var(--radius);
-
-  background: rgba(255, 77, 109, 0.035);
-
-}
-
-.nexus-kill-switch strong {
-
-  color: var(--red);
-
-  font-family: var(--font-display);
-
-  font-size: 12px;
-
-  letter-spacing: 0.08em;
-
-}
-
-.nexus-kill-switch span {
-
-  display: block;
-
-  margin-top: 4px;
+  padding: 18px 4px 4px;
 
   color: var(--muted);
 
-  font-family: var(--font-mono);
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
 
   font-size: 9px;
 
+  letter-spacing: 0.10em;
 }
 
-/* =========================================================
-
-   PULSE ANIMATION
-
-   ========================================================= */
-
-@keyframes nexusPulse {
-
-  0% {
-
-    opacity: 0.45;
-
-    transform: scale(0.92);
-
-  }
-
-  50% {
-
-    opacity: 1;
-
-    transform: scale(1);
-
-  }
-
-  100% {
-
-    opacity: 0.45;
-
-    transform: scale(0.92);
-
-  }
-
+.nexus-footer strong {
+  color: var(--cyan);
 }
 
-.nexus-live {
 
-  animation: nexusPulse 1.8s ease-in-out infinite;
+/* ========================================================
+   SPECIAL STATES
+======================================================== */
 
+.nexus-green {
+  color: var(--green);
 }
 
-/* =========================================================
-
-   SCROLLBARS
-
-   ========================================================= */
-
-* {
-
-  scrollbar-width: thin;
-
-  scrollbar-color: #263548 transparent;
-
+[data-sentiment] {
+  color: var(--yellow);
 }
+
+[data-liquidity] {
+  color: var(--cyan);
+}
+
+
+/* ========================================================
+   SCROLLBAR
+======================================================== */
 
 ::-webkit-scrollbar {
-
   width: 7px;
-
   height: 7px;
-
 }
 
 ::-webkit-scrollbar-track {
-
   background: transparent;
-
 }
 
 ::-webkit-scrollbar-thumb {
+  background: var(--panel-3);
 
-  background: #263548;
-
-  border-radius: 99px;
-
+  border-radius: 10px;
 }
 
-/* =========================================================
 
-   RESPONSIVE — TABLET
+/* ========================================================
+   MOBILE
+======================================================== */
 
-   ========================================================= */
+@media (max-width: 900px) {
 
-@media (max-width: 1100px) {
-
-  #nexusCommandCenter {
-
-    padding: 14px;
-
+  .nexus-app {
+    padding: 16px;
   }
 
-  .nexus-command-strip {
-
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  }
-
-  .nexus-v4-grid {
-
-    grid-template-columns: 1fr;
-
-  }
-
-  .nexus-v4-side {
-
-    display: grid;
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    align-items: start;
-
-  }
-
-  .nexus-agent-grid {
-
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  }
-
-}
-
-/* =========================================================
-
-   RESPONSIVE — MOBILE
-
-   ========================================================= */
-
-@media (max-width: 700px) {
-
-  #nexusCommandCenter {
-
-    padding: 9px;
-
-  }
-
-  .nexus-v4-header {
-
+  .nexus-header {
     flex-direction: column;
 
     align-items: flex-start;
+  }
 
+  .system-status {
+    justify-content: flex-start;
+  }
+
+  .command-strip {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .market-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .agent-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .position-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .trade-controls {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .ledger-entry {
+    grid-template-columns:
+      65px
+      60px
+      1fr;
+  }
+
+  .ledger-entry small {
+    grid-column: 1 / -1;
+  }
+
+}
+
+
+/* ========================================================
+   SMALL PHONE
+======================================================== */
+
+@media (max-width: 520px) {
+
+  .nexus-app {
+    padding: 10px;
+  }
+
+  .nexus-header h1 {
+    font-size: 25px;
+  }
+
+  .nexus-header p {
+    font-size: 9px;
+  }
+
+  .command-strip {
+    gap: 7px;
+  }
+
+  .stat-card {
+    padding: 13px;
+  }
+
+  .stat-card strong {
+    font-size: 18px;
+  }
+
+  .panel {
     padding: 14px;
 
+    margin-bottom: 10px;
   }
 
-  .nexus-v4-system {
-
-    justify-content: flex-start;
-
+  .panel-header {
+    align-items: flex-start;
   }
 
-  .nexus-command-strip {
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
+  .panel h2 {
+    font-size: 15px;
   }
 
-  .nexus-agent-grid {
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
+  .market-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
-  .nexus-v4-side {
-
-    display: flex;
-
-  }
-
-  .nexus-market {
-
-    grid-template-columns: 1fr auto;
-
-  }
-
-  .nexus-market-signal {
-
-    grid-column: 2;
-
-    grid-row: 1;
-
-  }
-
-  .nexus-vault-grid {
-
-    grid-template-columns: 1fr 1fr;
-
-  }
-
-  .nexus-telemetry {
-
-    grid-template-columns: 1fr 1fr;
-
-  }
-
-  .nexus-ledger-entry {
-
-    grid-template-columns: 60px 1fr;
-
-  }
-
-  .nexus-ledger-result {
-
-    grid-column: 2;
-
-  }
-
-}
-
-/* =========================================================
-
-   RESPONSIVE — SMALL PHONE
-
-   ========================================================= */
-
-@media (max-width: 430px) {
-
-  .nexus-v4-header h1 {
-
-    font-size: 20px;
-
-  }
-
-  .nexus-v4-kicker {
-
-    font-size: 9px;
-
-  }
-
-  .nexus-command-strip {
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 7px;
-
-  }
-
-  .nexus-stat {
-
-    min-height: 68px;
-
-    padding: 10px;
-
-  }
-
-  .nexus-stat strong {
-
-    font-size: 17px;
-
-  }
-
-  .nexus-agent-grid {
-
-    gap: 7px;
-
-  }
-
-  .nexus-agent {
-
-    padding: 10px;
-
-  }
-
-  .nexus-agent-name {
-
-    font-size: 12px;
-
-  }
-
-  .nexus-agent-role {
-
-    font-size: 8px;
-
-  }
-
-  .nexus-consensus-number strong {
-
-    font-size: 38px;
-
-  }
-
-  .nexus-panel-body {
-
+  .market-value {
     padding: 11px;
-
   }
 
-  .nexus-telemetry {
+  .market-value strong {
+    font-size: 13px;
+  }
 
-    grid-template-columns: 1fr 1fr;
+  .agent-grid {
+    grid-template-columns:
+      1fr 1fr;
 
+    gap: 7px;
+  }
+
+  .agent-card {
+    min-height: 105px;
+
+    padding: 12px;
+  }
+
+  .agent-name {
+    font-size: 12px;
+  }
+
+  .agent-role {
+    font-size: 8px;
+  }
+
+  .pipeline {
+    flex-direction: column;
+  }
+
+  .pipeline-node {
+    width: 100%;
+  }
+
+  .pipeline-arrow {
+    transform: rotate(90deg);
+  }
+
+  .position-grid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .trade-controls {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .nexus-footer {
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
   }
 
 }
 
-/* =========================================================
 
+/* ========================================================
    REDUCED MOTION
-
-   ========================================================= */
+======================================================== */
 
 @media (prefers-reduced-motion: reduce) {
 
   *,
-
   *::before,
-
   *::after {
+    animation: none !important;
 
-    animation-duration: 0.01ms !important;
-
-    animation-iteration-count: 1 !important;
+    transition: none !important;
 
     scroll-behavior: auto !important;
-
-    transition-duration: 0.01ms !important;
-
   }
 
 }
