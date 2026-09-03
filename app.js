@@ -23,1057 +23,778 @@ NO REAL MONEY
 (() => {
   "use strict";
 
-  // ======================================================
-  // CONFIGURATION
-  // ======================================================
+  /* ======================================================
+     CONFIGURATION
+  ====================================================== */
 
   const CONFIG = {
     startingBalance: 10000,
     consensusRequired: 76.8,
-
-    // Maximum notional exposure as a percentage of equity.
     maxExposurePercent: 20,
-
-    // Risk allocation per paper trade.
     riskPerTrade: 0.02,
-
-    // Automatic market cycle.
     cycleInterval: 4000,
-
-    // Ledger protection.
-    maxLedgerEntries: 100
+    maxLedgerEntries: 100,
+    initialBTC: 109915.06
   };
-
-  // ======================================================
-  // AGENTS
-  // ======================================================
 
   const AGENTS = {
     VESKA: {
-      name: "VESKA",
       role: "EXECUTION",
-      defaultStatus: "READY"
+      color: "cyan"
     },
-
     NORO: {
-      name: "NORO",
       role: "FAIR VALUE",
-      defaultStatus: "READY"
+      color: "blue"
     },
-
     LUMEN: {
-      name: "LUMEN",
       role: "SENTIMENT",
-      defaultStatus: "READY"
+      color: "yellow"
     },
-
     TIDAL: {
-      name: "TIDAL",
       role: "MARKET SCANNER",
-      defaultStatus: "SCANNING"
+      color: "cyan"
     },
-
     ZEPHR: {
-      name: "ZEPHR",
       role: "LIQUIDITY",
-      defaultStatus: "READY"
+      color: "green"
     },
-
     RUNE: {
-      name: "RUNE",
       role: "RISK GATE",
-      defaultStatus: "GUARDING"
+      color: "red"
     },
-
     OKAPI: {
-      name: "OKAPI",
       role: "EXPOSURE",
-      defaultStatus: "MONITORING"
+      color: "blue"
     },
-
     MARIN: {
-      name: "MARIN",
       role: "LIQUIDATION",
-      defaultStatus: "STANDBY"
+      color: "red"
     }
   };
 
-  // ======================================================
-  // STATE
-  // ======================================================
+  /* ======================================================
+     STATE
+  ====================================================== */
 
   const state = {
-    balance: CONFIG.startingBalance,
-    equity: CONFIG.startingBalance,
-
-    pnl: 0,
-    realizedPnl: 0,
-    unrealizedPnl: 0,
-
-    consensus: 0,
-    direction: "HOLD",
+    running: true,
+    cycle: 0,
 
     market: {
-      symbol: "BTC",
-      price: 0,
-      change24h: 0,
-      fairValue: 0,
-      volume: 0,
-      liquidity: 0,
-      sentiment: 0,
-      volatility: 0
+      price: CONFIG.initialBTC,
+      previousPrice: CONFIG.initialBTC,
+      change24h: -0.13,
+      fairValue: CONFIG.initialBTC + 183.74,
+      volume: 23.7,
+      liquidity: 79.44,
+      sentiment: -1
+    },
+
+    account: {
+      cash: CONFIG.startingBalance,
+      realizedPnL: 0,
+      fees: 0
     },
 
     position: {
       side: null,
       quantity: 0,
-      entryPrice: 0,
-      currentPrice: 0
+      entry: 0,
+      openedAt: null
     },
 
-    signals: [],
+    signals: {
+      NORO: null,
+      LUMEN: null,
+      TIDAL: null,
+      ZEPHR: null,
+      RUNE: null,
+      OKAPI: null,
+      MARIN: null,
+      VESKA: null
+    },
+
+    consensus: {
+      direction: "HOLD",
+      percentage: 50,
+      votes: {
+        BUY: 0,
+        SELL: 0,
+        HOLD: 0
+      }
+    },
 
     ledger: [],
 
-    system: {
-      running: true,
-      cycles: 0,
-      lastCycle: null
+    stats: {
+      wins: 0,
+      losses: 0,
+      trades: 0
     }
   };
 
-  // ======================================================
-  // DOM
-  // ======================================================
+  /* ======================================================
+     DOM HELPERS
+  ====================================================== */
 
   const $ = (selector) => document.querySelector(selector);
 
-  const $$ = (selector) =>
-    Array.from(document.querySelectorAll(selector));
+  const $$ = (selector) => [
+    ...document.querySelectorAll(selector)
+  ];
 
-  // ======================================================
-  // UTILITY
-  // ======================================================
+  function setText(selector, value) {
+    $$(selector).forEach((el) => {
+      el.textContent = value;
+    });
+  }
 
-  function random(min, max) {
-    return Math.random() * (max - min) + min;
+  function formatMoney(value) {
+    return Number(value || 0).toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD"
+    });
+  }
+
+  function formatNumber(value, decimals = 2) {
+    return Number(value || 0).toLocaleString("en-US", {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    });
   }
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
 
-  function round(value, decimals = 2) {
-    const factor = 10 ** decimals;
-    return Math.round(value * factor) / factor;
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
   }
 
-  function formatMoney(value) {
-    const number = Number(value) || 0;
-
-    return (
-      "$" +
-      number.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      })
-    );
-  }
-
-  function formatPercent(value) {
-    return `${Number(value || 0).toFixed(2)}%`;
-  }
-
-  function formatPrice(value) {
-    return formatMoney(value);
-  }
-
-  function timeNow() {
-    return new Date().toLocaleTimeString();
-  }
-
-  function signedPercent(value) {
-    const number = Number(value) || 0;
-
-    if (number > 0) {
-      return `+${number.toFixed(2)}%`;
-    }
-
-    return `${number.toFixed(2)}%`;
-  }
-
-  function signedMoney(value) {
-    const number = Number(value) || 0;
-
-    if (number > 0) {
-      return `+${formatMoney(number)}`;
-    }
-
-    return formatMoney(number);
-  }
-
-  // ======================================================
-  // MARKET INITIALIZATION
-  // ======================================================
-
-  function initializeMarket() {
-    state.market.price = random(95000, 115000);
-
-    state.market.change24h = random(-3.5, 3.5);
-
-    state.market.volume = random(20, 50);
-
-    state.market.liquidity = random(75, 98);
-
-    state.market.sentiment = random(-35, 35);
-
-    state.market.volatility = random(1, 6);
-
-    state.market.fairValue =
-      state.market.price *
-      random(0.985, 1.015);
-
-    state.position.currentPrice =
-      state.market.price;
-  }
-
-  // ======================================================
-  // MARKET ENGINE
-  // ======================================================
+  /* ======================================================
+     MARKET ENGINE
+  ====================================================== */
 
   function updateMarket() {
-    const volatilityFactor =
-      Math.max(0.35, state.market.volatility / 4);
-
-    const movement =
-      random(-0.65, 0.65) *
-      volatilityFactor;
-
-    state.market.price *=
-      1 + movement / 100;
-
-    state.market.change24h = clamp(
-      state.market.change24h +
-        random(-0.30, 0.30) *
-          volatilityFactor,
-      -15,
-      15
-    );
-
-    state.market.volume = clamp(
-      state.market.volume +
-        random(-3, 3),
-      5,
-      100
-    );
-
-    state.market.liquidity = clamp(
-      state.market.liquidity +
-        random(-2.5, 2.5),
-      15,
-      100
-    );
-
-    state.market.sentiment = clamp(
-      state.market.sentiment +
-        random(-9, 9),
-      -100,
-      100
-    );
-
-    state.market.volatility = clamp(
-      state.market.volatility +
-        random(-0.5, 0.5),
-      0.5,
-      12
-    );
+    state.market.previousPrice = state.market.price;
 
     /*
-      Fair value intentionally moves independently
-      from spot price so NORO has something to analyze.
+      Small randomized market movement.
+      This intentionally behaves like a paper-market simulator.
     */
+
+    const volatility = random(-0.004, 0.004);
+
+    state.market.price =
+      state.market.price * (1 + volatility);
+
+    state.market.price = Math.max(
+      1000,
+      state.market.price
+    );
+
+    state.market.change24h += random(-0.08, 0.08);
+    state.market.change24h = clamp(
+      state.market.change24h,
+      -8,
+      8
+    );
 
     state.market.fairValue =
       state.market.price *
-      random(0.982, 1.018);
+      (1 + random(-0.004, 0.004));
 
-    state.position.currentPrice =
-      state.market.price;
+    state.market.volume =
+      clamp(
+        state.market.volume + random(-0.7, 0.7),
+        5,
+        100
+      );
 
-    calculateUnrealizedPnl();
+    state.market.liquidity =
+      clamp(
+        state.market.liquidity + random(-2.5, 2.5),
+        20,
+        99
+      );
+
+    state.market.sentiment =
+      clamp(
+        state.market.sentiment + random(-1, 1),
+        -100,
+        100
+      );
   }
 
-  // ======================================================
-  // NORO — FAIR VALUE
-  // ======================================================
+  /* ======================================================
+     AGENT: NORO
+     FAIR VALUE
+  ====================================================== */
 
   function runNORO() {
     const difference =
-      ((state.market.price -
-        state.market.fairValue) /
-        state.market.fairValue) *
-      100;
+      ((state.market.fairValue -
+        state.market.price) /
+        state.market.price) * 100;
 
-    if (difference <= -1) {
-      return {
-        agent: "NORO",
-        signal: "BUY",
-        score: clamp(
-          72 + Math.abs(difference) * 7,
-          72,
-          98
-        )
-      };
-    }
+    let signal = "HOLD";
 
-    if (difference >= 1) {
-      return {
-        agent: "NORO",
-        signal: "SELL",
-        score: clamp(
-          72 + Math.abs(difference) * 7,
-          72,
-          98
-        )
-      };
+    if (difference > 0.15) {
+      signal = "BUY";
+    } else if (difference < -0.15) {
+      signal = "SELL";
     }
 
     return {
-      agent: "NORO",
-      signal: "HOLD",
-      score: random(55, 78)
+      signal,
+      score: Math.abs(difference),
+      reason:
+        `Fair value ${difference >= 0 ? "+" : ""}${difference.toFixed(2)}% from market`
     };
   }
 
-  // ======================================================
-  // LUMEN — SENTIMENT
-  // ======================================================
+  /* ======================================================
+     AGENT: LUMEN
+     SENTIMENT
+  ====================================================== */
 
   function runLUMEN() {
     const sentiment =
       state.market.sentiment;
 
-    if (sentiment >= 25) {
-      return {
-        agent: "LUMEN",
-        signal: "BUY",
-        score: clamp(
-          60 + sentiment * 0.38,
-          60,
-          98
-        )
-      };
-    }
+    let signal = "HOLD";
 
-    if (sentiment <= -25) {
-      return {
-        agent: "LUMEN",
-        signal: "SELL",
-        score: clamp(
-          60 + Math.abs(sentiment) * 0.38,
-          60,
-          98
-        )
-      };
+    if (sentiment > 20) {
+      signal = "BUY";
+    } else if (sentiment < -20) {
+      signal = "SELL";
     }
 
     return {
-      agent: "LUMEN",
-      signal: "HOLD",
-      score: random(55, 78)
+      signal,
+      score: Math.abs(sentiment),
+      reason:
+        `Sentiment index ${sentiment.toFixed(1)}`
     };
   }
 
-  // ======================================================
-  // TIDAL — MARKET SCANNER
-  // ======================================================
+  /* ======================================================
+     AGENT: TIDAL
+     MARKET SCANNER
+  ====================================================== */
 
   function runTIDAL() {
     const momentum =
-      state.market.change24h;
+      ((state.market.price -
+        state.market.previousPrice) /
+        state.market.previousPrice) * 100;
 
-    if (momentum >= 1.2) {
-      return {
-        agent: "TIDAL",
-        signal: "BUY",
-        score: clamp(
-          70 + momentum * 2,
-          70,
-          96
-        )
-      };
-    }
+    let signal = "HOLD";
 
-    if (momentum <= -1.2) {
-      return {
-        agent: "TIDAL",
-        signal: "SELL",
-        score: clamp(
-          70 + Math.abs(momentum) * 2,
-          70,
-          96
-        )
-      };
+    if (momentum > 0.12) {
+      signal = "BUY";
+    } else if (momentum < -0.12) {
+      signal = "SELL";
     }
 
     return {
-      agent: "TIDAL",
-      signal: "HOLD",
-      score: random(55, 76)
+      signal,
+      score: Math.abs(momentum),
+      reason:
+        `Short-term momentum ${momentum >= 0 ? "+" : ""}${momentum.toFixed(3)}%`
     };
   }
 
-  // ======================================================
-  // ZEPHR — LIQUIDITY
-  // ======================================================
+  /* ======================================================
+     AGENT: ZEPHR
+     LIQUIDITY
+  ====================================================== */
 
   function runZEPHR() {
     const liquidity =
       state.market.liquidity;
 
-    if (liquidity < 40) {
-      return {
-        agent: "ZEPHR",
-        signal: "BLOCK",
-        score: 95
-      };
-    }
+    let signal = "CLEAR";
 
-    if (liquidity < 55) {
-      return {
-        agent: "ZEPHR",
-        signal: "CAUTION",
-        score: 72
-      };
+    if (liquidity < 35) {
+      signal = "BLOCK";
+    } else if (liquidity < 55) {
+      signal = "CAUTION";
     }
 
     return {
-      agent: "ZEPHR",
-      signal: "PASS",
-      score: liquidity
+      signal,
+      score: liquidity,
+      reason:
+        `Liquidity ${liquidity.toFixed(2)}%`
     };
   }
 
-  // ======================================================
-  // RUNE — RISK
-  // ======================================================
+  /* ======================================================
+     AGENT: RUNE
+     RISK
+  ====================================================== */
 
   function runRUNE() {
-    const riskScore =
-      Math.abs(
-        state.market.change24h
-      ) +
-      state.market.volatility * 1.5 +
-      (100 - state.market.liquidity) / 8;
+    const positionValue =
+      state.position.quantity *
+      state.market.price;
 
-    if (riskScore > 15) {
-      return {
-        agent: "RUNE",
-        signal: "BLOCK",
-        score: clamp(
-          80 + riskScore,
-          80,
-          99
-        )
-      };
-    }
+    const equity =
+      state.account.cash +
+      positionValue;
 
-    if (riskScore > 10) {
-      return {
-        agent: "RUNE",
-        signal: "CAUTION",
-        score: 76
-      };
-    }
-
-    return {
-      agent: "RUNE",
-      signal: "PASS",
-      score: random(82, 98)
-    };
-  }
-
-  // ======================================================
-  // OKAPI — EXPOSURE
-  // ======================================================
-
-  function getExposurePercent() {
-    const notional =
-      Math.abs(
-        state.position.quantity *
-          state.market.price
-      );
-
-    if (state.equity <= 0) {
-      return 100;
-    }
-
-    return (
-      notional /
-      state.equity
-    ) * 100;
-  }
-
-  function runOKAPI() {
-    const exposure =
-      getExposurePercent();
-
-    if (
-      exposure >
-      CONFIG.maxExposurePercent
-    ) {
-      return {
-        agent: "OKAPI",
-        signal: "REDUCE",
-        score: 96
-      };
-    }
-
-    return {
-      agent: "OKAPI",
-      signal: "PASS",
-      score: random(82, 98)
-    };
-  }
-
-  // ======================================================
-  // MARIN — LIQUIDATION
-  // ======================================================
-
-  function runMARIN() {
-    const exposure =
-      getExposurePercent();
-
-    const drawdown =
-      state.equity <
-      CONFIG.startingBalance
-        ? (
-            (CONFIG.startingBalance -
-              state.equity) /
-            CONFIG.startingBalance
-          ) * 100
+    const riskPercent =
+      equity > 0
+        ? (positionValue / equity) * 100
         : 0;
 
-    if (
-      exposure >
-        CONFIG.maxExposurePercent ||
-      drawdown >= 5
-    ) {
+    let signal = "CLEAR";
+
+    if (riskPercent >= 20) {
+      signal = "BLOCK";
+    } else if (riskPercent >= 12) {
+      signal = "CAUTION";
+    }
+
+    return {
+      signal,
+      score: riskPercent,
+      reason:
+        `Portfolio risk ${riskPercent.toFixed(2)}%`
+    };
+  }
+
+  /* ======================================================
+     AGENT: OKAPI
+     EXPOSURE
+  ====================================================== */
+
+  function runOKAPI() {
+    const positionValue =
+      state.position.quantity *
+      state.market.price;
+
+    const totalEquity =
+      state.account.cash +
+      positionValue;
+
+    const exposure =
+      totalEquity > 0
+        ? (positionValue / totalEquity) * 100
+        : 0;
+
+    let signal = "CLEAR";
+
+    if (exposure >= CONFIG.maxExposurePercent) {
+      signal = "BLOCK";
+    } else if (exposure >= 12) {
+      signal = "CAUTION";
+    }
+
+    return {
+      signal,
+      score: exposure,
+      reason:
+        `Exposure ${exposure.toFixed(2)}%`
+    };
+  }
+
+  /* ======================================================
+     AGENT: MARIN
+     LIQUIDATION
+  ====================================================== */
+
+  function runMARIN() {
+    if (!state.position.side) {
       return {
-        agent: "MARIN",
+        signal: "STANDBY",
+        score: 0,
+        reason: "No active position"
+      };
+    }
+
+    const unrealized =
+      getUnrealizedPnL();
+
+    const equity =
+      getEquity();
+
+    const drawdown =
+      equity > 0
+        ? (unrealized / equity) * 100
+        : 0;
+
+    if (drawdown <= -5) {
+      return {
         signal: "LIQUIDATE",
-        score: 98
+        score: Math.abs(drawdown),
+        reason:
+          `Drawdown ${drawdown.toFixed(2)}%`
       };
     }
 
     return {
-      agent: "MARIN",
       signal: "STANDBY",
-      score: random(80, 95)
+      score: Math.abs(drawdown),
+      reason:
+        `Position stable ${drawdown >= 0 ? "+" : ""}${drawdown.toFixed(2)}%`
     };
   }
 
-  // ======================================================
-  // CONSENSUS
-  // ======================================================
+  /* ======================================================
+     CONSENSUS ENGINE
+  ====================================================== */
 
   function calculateConsensus() {
-    const directional =
-      state.signals.filter(
-        signal =>
-          signal.signal === "BUY" ||
-          signal.signal === "SELL"
-      );
+    const votes = {
+      BUY: 0,
+      SELL: 0,
+      HOLD: 0
+    };
 
-    if (!directional.length) {
-      state.consensus = 50;
-      state.direction = "HOLD";
-      return;
-    }
+    [
+      "NORO",
+      "LUMEN",
+      "TIDAL"
+    ].forEach((agent) => {
+      const signal =
+        state.signals[agent]?.signal;
 
-    const buyScore =
-      directional
-        .filter(
-          signal =>
-            signal.signal === "BUY"
-        )
-        .reduce(
-          (total, signal) =>
-            total + signal.score,
-          0
-        );
-
-    const sellScore =
-      directional
-        .filter(
-          signal =>
-            signal.signal === "SELL"
-        )
-        .reduce(
-          (total, signal) =>
-            total + signal.score,
-          0
-        );
+      if (signal === "BUY") {
+        votes.BUY++;
+      } else if (signal === "SELL") {
+        votes.SELL++;
+      } else {
+        votes.HOLD++;
+      }
+    });
 
     const total =
-      buyScore + sellScore;
+      votes.BUY +
+      votes.SELL +
+      votes.HOLD;
 
-    if (total <= 0) {
-      state.consensus = 50;
-      state.direction = "HOLD";
-      return;
+    let direction = "HOLD";
+    let percentage = 50;
+
+    if (total > 0) {
+      if (
+        votes.BUY >= votes.SELL &&
+        votes.BUY > votes.HOLD
+      ) {
+        direction = "BUY";
+        percentage =
+          (votes.BUY / total) * 100;
+      } else if (
+        votes.SELL > votes.BUY &&
+        votes.SELL > votes.HOLD
+      ) {
+        direction = "SELL";
+        percentage =
+          (votes.SELL / total) * 100;
+      } else {
+        direction = "HOLD";
+        percentage =
+          (votes.HOLD / total) * 100;
+      }
     }
 
-    if (buyScore > sellScore) {
-      state.direction = "BUY";
+    state.consensus = {
+      direction,
+      percentage,
+      votes
+    };
 
-      state.consensus =
-        (buyScore / total) * 100;
-    } else if (sellScore > buyScore) {
-      state.direction = "SELL";
-
-      state.consensus =
-        (sellScore / total) * 100;
-    } else {
-      state.direction = "HOLD";
-      state.consensus = 50;
-    }
+    return state.consensus;
   }
 
-  // ======================================================
-  // RISK GATE
-  // ======================================================
+  /* ======================================================
+     RISK GATE
+  ====================================================== */
 
   function riskGate() {
-    const rune =
-      state.signals.find(
-        signal =>
-          signal.agent === "RUNE"
-      );
+    const {
+      direction,
+      percentage
+    } = state.consensus;
 
-    const zephr =
-      state.signals.find(
-        signal =>
-          signal.agent === "ZEPHR"
-      );
-
-    const okapi =
-      state.signals.find(
-        signal =>
-          signal.agent === "OKAPI"
-      );
-
-    const marin =
-      state.signals.find(
-        signal =>
-          signal.agent === "MARIN"
-      );
-
-    if (
-      rune?.signal === "BLOCK"
-    ) {
-      addLedger(
-        "RUNE",
-        "RISK BLOCK",
-        "Market risk exceeded safe threshold."
-      );
-
-      return false;
+    if (direction === "HOLD") {
+      return {
+        approved: false,
+        reason: "Consensus is HOLD"
+      };
     }
 
     if (
-      zephr?.signal === "BLOCK"
+      percentage <
+      CONFIG.consensusRequired
     ) {
-      addLedger(
-        "ZEPHR",
-        "LIQUIDITY BLOCK",
-        "Insufficient market liquidity."
-      );
-
-      return false;
+      return {
+        approved: false,
+        reason:
+          `Consensus ${percentage.toFixed(1)}% below ${CONFIG.consensusRequired}%`
+      };
     }
 
     if (
-      marin?.signal === "LIQUIDATE"
+      state.signals.ZEPHR?.signal === "BLOCK"
     ) {
-      if (state.position.side) {
-        closePosition(
-          "MARIN",
-          "LIQUIDATION"
-        );
-      }
-
-      return false;
+      return {
+        approved: false,
+        reason: "ZEPHR blocked: insufficient liquidity"
+      };
     }
 
     if (
-      okapi?.signal === "REDUCE"
+      state.signals.RUNE?.signal === "BLOCK"
     ) {
-      if (state.position.side) {
-        closePosition(
-          "OKAPI",
-          "EXPOSURE REDUCTION"
-        );
-      }
-
-      return false;
+      return {
+        approved: false,
+        reason: "RUNE blocked: excessive risk"
+      };
     }
 
-    return true;
+    if (
+      state.signals.OKAPI?.signal === "BLOCK"
+    ) {
+      return {
+        approved: false,
+        reason: "OKAPI blocked: excessive exposure"
+      };
+    }
+
+    if (
+      state.signals.MARIN?.signal === "LIQUIDATE"
+    ) {
+      return {
+        approved: false,
+        reason: "MARIN requested liquidation"
+      };
+    }
+
+    return {
+      approved: true,
+      reason:
+        `Consensus approved at ${percentage.toFixed(1)}%`
+    };
   }
 
-  // ======================================================
-  // POSITION SIZE
-  // ======================================================
+  /* ======================================================
+     AGENT CYCLE
+  ====================================================== */
 
-  function calculateTradeQuantity() {
-    const riskCapital =
-      state.equity *
-      CONFIG.riskPerTrade;
+  function runAgentCycle() {
+    state.signals.NORO =
+      runNORO();
 
-    if (
-      state.market.price <= 0
-    ) {
+    state.signals.LUMEN =
+      runLUMEN();
+
+    state.signals.TIDAL =
+      runTIDAL();
+
+    state.signals.ZEPHR =
+      runZEPHR();
+
+    state.signals.RUNE =
+      runRUNE();
+
+    state.signals.OKAPI =
+      runOKAPI();
+
+    state.signals.MARIN =
+      runMARIN();
+
+    calculateConsensus();
+
+    const gate =
+      riskGate();
+
+    state.signals.VESKA = {
+      signal:
+        gate.approved
+          ? `EXECUTE ${state.consensus.direction}`
+          : "WAIT",
+      score:
+        state.consensus.percentage,
+      reason:
+        gate.reason
+    };
+
+    return gate;
+  }
+
+  /* ======================================================
+     ACCOUNTING
+  ====================================================== */
+
+  function getUnrealizedPnL() {
+    if (!state.position.side) {
       return 0;
     }
 
+    const price =
+      state.market.price;
+
+    const entry =
+      state.position.entry;
+
+    const qty =
+      state.position.quantity;
+
+    if (state.position.side === "LONG") {
+      return (price - entry) * qty;
+    }
+
+    if (state.position.side === "SHORT") {
+      return (entry - price) * qty;
+    }
+
+    return 0;
+  }
+
+  function getEquity() {
+    const positionValue =
+      state.position.quantity *
+      state.market.price;
+
     return (
-      riskCapital /
-      state.market.price
+      state.account.cash +
+      positionValue +
+      getUnrealizedPnL()
     );
   }
 
-  // ======================================================
-  // PAPER EXECUTION — VESKA
-  // ======================================================
+  /* ======================================================
+     PAPER TRADE EXECUTION
+  ====================================================== */
 
-  function executePaperTrade(
-    direction,
-    source = "VESKA"
-  ) {
+  function executePaperTrade(direction) {
     if (
       direction !== "BUY" &&
       direction !== "SELL"
     ) {
-      return;
+      return false;
     }
 
-    if (
-      state.consensus <
-      CONFIG.consensusRequired
-    ) {
-      addLedger(
-        source,
-        "TRADE BLOCKED",
-        `Consensus ${state.consensus.toFixed(
-          1
-        )}% < ${CONFIG.consensusRequired}%`
-      );
+    /*
+      Do not stack multiple positions.
+      Opposite direction closes the current position first.
+    */
 
-      return;
+    if (state.position.side) {
+      const sameDirection =
+        (
+          direction === "BUY" &&
+          state.position.side === "LONG"
+        ) ||
+        (
+          direction === "SELL" &&
+          state.position.side === "SHORT"
+        );
+
+      if (sameDirection) {
+        return false;
+      }
+
+      closePosition("REVERSAL");
     }
+
+    const equity =
+      getEquity();
+
+    const riskCapital =
+      equity *
+      CONFIG.riskPerTrade;
 
     const quantity =
-      calculateTradeQuantity();
-
-    if (quantity <= 0) {
-      return;
-    }
-
-    // --------------------------------------------
-    // BUY
-    // --------------------------------------------
-
-    if (direction === "BUY") {
-      if (
-        state.position.side ===
-        "SHORT"
-      ) {
-        closePosition(
-          "VESKA",
-          "REVERSE TO LONG"
-        );
-      }
-
-      if (
-        !state.position.side
-      ) {
-        state.position.side =
-          "LONG";
-
-        state.position.quantity =
-          quantity;
-
-        state.position.entryPrice =
-          state.market.price;
-
-        state.position.currentPrice =
-          state.market.price;
-
-        addLedger(
-          "VESKA",
-          "PAPER BUY",
-          `${quantity.toFixed(
-            6
-          )} BTC @ ${formatPrice(
-            state.market.price
-          )}`
-        );
-      }
-    }
-
-    // --------------------------------------------
-    // SELL / SHORT
-    // --------------------------------------------
-
-    if (direction === "SELL") {
-      if (
-        state.position.side ===
-        "LONG"
-      ) {
-        closePosition(
-          "VESKA",
-          "REVERSE TO SHORT"
-        );
-      }
-
-      if (
-        !state.position.side
-      ) {
-        state.position.side =
-          "SHORT";
-
-        state.position.quantity =
-          quantity;
-
-        state.position.entryPrice =
-          state.market.price;
-
-        state.position.currentPrice =
-          state.market.price;
-
-        addLedger(
-          "VESKA",
-          "PAPER SELL",
-          `${quantity.toFixed(
-            6
-          )} BTC @ ${formatPrice(
-            state.market.price
-          )}`
-        );
-      }
-    }
-
-    calculateUnrealizedPnl();
-  }
-
-  // ======================================================
-  // P&L
-  // ======================================================
-
-  function calculateUnrealizedPnl() {
-    if (
-      !state.position.side ||
-      state.position.quantity <= 0
-    ) {
-      state.unrealizedPnl = 0;
-
-      state.pnl =
-        state.realizedPnl;
-
-      state.equity =
-        CONFIG.startingBalance +
-        state.realizedPnl;
-
-      return;
-    }
-
-    const entry =
-      state.position.entryPrice;
-
-    const current =
+      riskCapital /
       state.market.price;
 
-    const quantity =
-      state.position.quantity;
-
     if (
-      state.position.side ===
-      "LONG"
+      !Number.isFinite(quantity) ||
+      quantity <= 0
     ) {
-      state.unrealizedPnl =
-        (current - entry) *
-        quantity;
+      return false;
     }
 
-    if (
-      state.position.side ===
-      "SHORT"
-    ) {
-      state.unrealizedPnl =
-        (entry - current) *
-        quantity;
-    }
+    const side =
+      direction === "BUY"
+        ? "LONG"
+        : "SHORT";
 
-    state.pnl =
-      state.realizedPnl +
-      state.unrealizedPnl;
+    state.position = {
+      side,
+      quantity,
+      entry: state.market.price,
+      openedAt: Date.now()
+    };
 
-    state.equity =
-      CONFIG.startingBalance +
-      state.pnl;
+    state.stats.trades++;
 
-    state.balance =
-      state.equity;
+    addLedger(
+      "VESKA",
+      `${direction} EXECUTED`,
+      `${quantity.toFixed(6)} BTC @ ${formatMoney(state.market.price)}`
+    );
+
+    return true;
   }
 
-  // ======================================================
-  // CLOSE POSITION — MARIN
-  // ======================================================
+  /* ======================================================
+     CLOSE POSITION
+  ====================================================== */
 
-  function closePosition(
-    agent = "MARIN",
-    reason = "POSITION CLOSED"
-  ) {
-    if (
-      !state.position.side
-    ) {
-      return;
+  function closePosition(reason = "MANUAL") {
+    if (!state.position.side) {
+      return false;
     }
 
-    calculateUnrealizedPnl();
+    const pnl =
+      getUnrealizedPnL();
 
-    const closingPnl =
-      state.unrealizedPnl;
+    state.account.realizedPnL += pnl;
+
+    if (pnl >= 0) {
+      state.stats.wins++;
+    } else {
+      state.stats.losses++;
+    }
 
     const side =
       state.position.side;
 
-    const quantity =
+    const qty =
       state.position.quantity;
 
-    state.realizedPnl +=
-      closingPnl;
-
-    state.position.side =
-      null;
-
-    state.position.quantity =
-      0;
-
-    state.position.entryPrice =
-      0;
-
-    state.position.currentPrice =
-      0;
-
-    state.unrealizedPnl = 0;
-
-    state.pnl =
-      state.realizedPnl;
-
-    state.equity =
-      CONFIG.startingBalance +
-      state.realizedPnl;
-
-    state.balance =
-      state.equity;
-
     addLedger(
-      agent,
-      reason,
-      `${side} ${quantity.toFixed(
-        6
-      )} BTC | P&L ${signedMoney(
-        closingPnl
-      )}`
+      "MARIN",
+      "POSITION CLOSED",
+      `${side} ${qty.toFixed(6)} BTC | P&L ${formatMoney(pnl)} | ${reason}`
     );
+
+    state.position = {
+      side: null,
+      quantity: 0,
+      entry: 0,
+      openedAt: null
+    };
+
+    return true;
   }
 
-  // ======================================================
-  // FULL AGENT CYCLE
-  // ======================================================
-
-  function runAgentCycle() {
-    state.signals = [];
-
-    // Analysis agents
-    state.signals.push(
-      runNORO()
-    );
-
-    state.signals.push(
-      runLUMEN()
-    );
-
-    state.signals.push(
-      runTIDAL()
-    );
-
-    state.signals.push(
-      runZEPHR()
-    );
-
-    state.signals.push(
-      runRUNE()
-    );
-
-    state.signals.push(
-      runOKAPI()
-    );
-
-    state.signals.push(
-      runMARIN()
-    );
-
-    calculateConsensus();
-  }
-
-  // ======================================================
-  // TRADING CYCLE
-  // ======================================================
-
-  function tradingCycle() {
-    if (
-      !state.system.running
-    ) {
-      return;
-    }
-
-    updateMarket();
-
-    runAgentCycle();
-
-    const approved =
-      riskGate();
-
-    if (approved) {
-      executePaperTrade(
-        state.direction
-      );
-    }
-
-    state.system.cycles += 1;
-
-    state.system.lastCycle =
-      timeNow();
-
-    render();
-
-    console.log(
-      `[NEXUS] Cycle ${
-        state.system.cycles
-      } | ${
-        state.direction
-      } | Consensus ${
-        state.consensus.toFixed(1)
-      }%`
-    );
-  }
-
-  // ======================================================
-  // LEDGER
-  // ======================================================
+  /* ======================================================
+     LEDGER
+  ====================================================== */
 
   function addLedger(
     agent,
@@ -1081,7 +802,7 @@ NO REAL MONEY
     details
   ) {
     state.ledger.unshift({
-      time: timeNow(),
+      time: nowTime(),
       agent,
       action,
       details
@@ -1093,333 +814,405 @@ NO REAL MONEY
     ) {
       state.ledger.pop();
     }
-
-    renderLedger();
   }
 
-  // ======================================================
-  // AGENT STATUS
-  // ======================================================
+  /* ======================================================
+     MAIN TRADING CYCLE
+  ====================================================== */
 
-  function getAgentStatus(
-    agent
-  ) {
-    const signal =
-      state.signals.find(
-        item =>
-          item.agent === agent
-      );
-
-    if (!signal) {
-      return AGENTS[agent]
-        .defaultStatus;
+  function tradingCycle() {
+    if (!state.running) {
+      return;
     }
 
-    switch (
-      signal.signal
+    updateMarket();
+
+    const gate =
+      runAgentCycle();
+
+    /*
+      MARIN liquidation has priority.
+    */
+
+    if (
+      state.signals.MARIN?.signal ===
+      "LIQUIDATE"
     ) {
-      case "BUY":
-        return "BUY SIGNAL";
-
-      case "SELL":
-        return "SELL SIGNAL";
-
-      case "HOLD":
-        return "HOLD";
-
-      case "PASS":
-        return "PASS";
-
-      case "BLOCK":
-        return "BLOCKED";
-
-      case "CAUTION":
-        return "CAUTION";
-
-      case "REDUCE":
-        return "REDUCE";
-
-      case "LIQUIDATE":
-        return "LIQUIDATE";
-
-      default:
-        return AGENTS[agent]
-          .defaultStatus;
+      closePosition("MARIN RISK CONTROL");
     }
-  }
 
-  // ======================================================
-  // RENDER AGENTS
-  // ======================================================
+    /*
+      Execute only when all gates approve.
+    */
 
-  function renderAgents() {
-    $$(".agent-card").forEach(
-      card => {
-        const agent =
-          card.dataset.agent;
+    if (
+      gate.approved &&
+      (
+        state.consensus.direction === "BUY" ||
+        state.consensus.direction === "SELL"
+      )
+    ) {
+      executePaperTrade(
+        state.consensus.direction
+      );
+    }
 
-        if (
-          !AGENTS[agent]
-        ) {
-          return;
-        }
+    state.cycle++;
 
-        const name =
-          card.querySelector(
-            ".agent-name"
-          );
-
-        const role =
-          card.querySelector(
-            ".agent-role"
-          );
-
-        const status =
-          card.querySelector(
-            "strong"
-          );
-
-        if (name) {
-          name.textContent =
-            AGENTS[agent].name;
-        }
-
-        if (role) {
-          role.textContent =
-            AGENTS[agent].role;
-        }
-
-        if (status) {
-          status.textContent =
-            getAgentStatus(
-              agent
-            );
-        }
-      }
-    );
-  }
-
-  // ======================================================
-  // RENDER MARKET
-  // ======================================================
-
-  function renderMarket() {
-    const priceElements =
-      $$("#price");
-
-    priceElements.forEach(
-      element => {
-        element.textContent =
-          formatPrice(
-            state.market.price
-          );
-      }
+    addLedger(
+      "NEXUS",
+      "CYCLE COMPLETE",
+      `${state.consensus.direction} | ${state.consensus.percentage.toFixed(1)}% consensus`
     );
 
-    const change =
-      $("#change");
-
-    if (change) {
-      change.textContent =
-        signedPercent(
-          state.market.change24h
-        );
-    }
-
-    const fairValue =
-      $("#fair-value");
-
-    if (fairValue) {
-      fairValue.textContent =
-        formatPrice(
-          state.market.fairValue
-        );
-    }
-
-    const volume =
-      $("#volume");
-
-    if (volume) {
-      volume.textContent =
-        `${state.market.volume.toFixed(
-          1
-        )}B`;
-    }
-
-    const liquidity =
-      $("#liquidity");
-
-    if (liquidity) {
-      liquidity.textContent =
-        formatPercent(
-          state.market.liquidity
-        );
-    }
-
-    const sentiment =
-      $("#sentiment");
-
-    if (sentiment) {
-      sentiment.textContent =
-        `${Math.round(
-          state.market.sentiment
-        )}`;
-    }
-
-    const signal =
-      $("#signal");
-
-    if (signal) {
-      signal.textContent =
-        state.direction;
-    }
+    render();
   }
 
-  // ======================================================
-  // RENDER STATS
-  // ======================================================
+  /* ======================================================
+     RENDER: HEADER/STATS
+  ====================================================== */
 
   function renderStats() {
-    const vitality =
-      $("#vitality");
-
-    if (vitality) {
-      const vitalityValue =
-        clamp(
-          100 -
-            Math.abs(
-              state.market.change24h
-            ) *
-              2,
-          50,
-          100
-        );
-
-      vitality.textContent =
-        `${vitalityValue.toFixed(
-          0
-        )}%`;
-    }
-
-    const consensus =
-      $("#consensus");
-
-    if (consensus) {
-      consensus.textContent =
-        `${state.consensus.toFixed(
-          1
-        )}%`;
-    }
-
     const equity =
-      $("#equity");
-
-    if (equity) {
-      equity.textContent =
-        formatMoney(
-          state.equity
-        );
-    }
-
-    const pnl =
-      $("#pnl");
-
-    if (pnl) {
-      pnl.textContent =
-        signedMoney(
-          state.pnl
-        );
-    }
-
-    const cycles =
-      $("#cycles");
-
-    if (cycles) {
-      cycles.textContent =
-        state.system.cycles;
-    }
-
-    const cycle =
-      $("#cycle");
-
-    if (cycle) {
-      cycle.textContent =
-        state.system.cycles;
-    }
-
-    const lastCycle =
-      $("#last-cycle");
-
-    if (lastCycle) {
-      lastCycle.textContent =
-        state.system.lastCycle ||
-        "—";
-    }
-  }
-
-  // ======================================================
-  // RENDER POSITION
-  // ======================================================
-
-  function renderPosition() {
-    const position =
-      $("#position");
-
-    const currentPosition =
-      $("#current-position");
-
-    const entry =
-      $("#entry");
+      getEquity();
 
     const unrealized =
-      $("#unrealized");
+      getUnrealizedPnL();
 
-    let label = "FLAT";
+    const totalPnL =
+      state.account.realizedPnL +
+      unrealized;
 
-    if (
-      state.position.side ===
-      "LONG"
-    ) {
-      label = "LONG";
+    setText(
+      "#vitality",
+      "100%"
+    );
+
+    setText(
+      "#consensus",
+      `${state.consensus.percentage.toFixed(1)}%`
+    );
+
+    setText(
+      "#equity",
+      formatMoney(equity)
+    );
+
+    setText(
+      "#pnl",
+      formatMoney(totalPnL)
+    );
+
+    setText(
+      "#cycles",
+      state.cycle
+    );
+
+    setText(
+      "#last-cycle",
+      nowTime()
+    );
+
+    const consensusElements =
+      $$("#consensus");
+
+    consensusElements.forEach((el) => {
+      if (
+        state.consensus.percentage >=
+        CONFIG.consensusRequired
+      ) {
+        el.style.color = "var(--green)";
+      } else {
+        el.style.color = "var(--yellow)";
+      }
+    });
+
+    /*
+      Add a live consensus meter underneath
+      the existing consensus number.
+    */
+
+    let meter =
+      $("#nexus-consensus-meter");
+
+    if (!meter) {
+      const target =
+        $("#consensus");
+
+      if (target) {
+        meter =
+          document.createElement("div");
+
+        meter.id =
+          "nexus-consensus-meter";
+
+        meter.style.height = "4px";
+        meter.style.width = "100%";
+        meter.style.marginTop = "8px";
+        meter.style.background =
+          "rgba(255,255,255,.08)";
+        meter.style.borderRadius = "99px";
+        meter.style.overflow = "hidden";
+
+        const bar =
+          document.createElement("div");
+
+        bar.id =
+          "nexus-consensus-bar";
+
+        bar.style.height = "100%";
+        bar.style.width = "0%";
+        bar.style.transition =
+          "width .3s ease";
+
+        meter.appendChild(bar);
+
+        target.parentElement?.appendChild(meter);
+      }
     }
 
-    if (
-      state.position.side ===
-      "SHORT"
-    ) {
-      label = "SHORT";
-    }
+    const bar =
+      $("#nexus-consensus-bar");
 
-    if (position) {
-      position.textContent =
-        label;
-    }
+    if (bar) {
+      bar.style.width =
+        `${state.consensus.percentage}%`;
 
-    if (currentPosition) {
-      currentPosition.textContent =
-        label;
-    }
-
-    if (entry) {
-      entry.textContent =
-        state.position.entryPrice
-          ? formatPrice(
-              state.position.entryPrice
-            )
-          : "—";
-    }
-
-    if (unrealized) {
-      unrealized.textContent =
-        signedMoney(
-          state.unrealizedPnl
-        );
+      if (
+        state.consensus.percentage >=
+        CONFIG.consensusRequired
+      ) {
+        bar.style.background =
+          "var(--green)";
+      } else {
+        bar.style.background =
+          "var(--yellow)";
+      }
     }
   }
 
-  // ======================================================
-  // RENDER LEDGER
-  // ======================================================
+  /* ======================================================
+     RENDER: MARKET
+  ====================================================== */
+
+  function renderMarket() {
+    setText(
+      "#price",
+      formatMoney(state.market.price)
+    );
+
+    setText(
+      "#change",
+      `${state.market.change24h >= 0 ? "+" : ""}${state.market.change24h.toFixed(2)}%`
+    );
+
+    setText(
+      "#fair-value",
+      formatMoney(state.market.fairValue)
+    );
+
+    setText(
+      "#volume",
+      `${state.market.volume.toFixed(1)}B`
+    );
+
+    setText(
+      "#liquidity",
+      `${state.market.liquidity.toFixed(2)}%`
+    );
+
+    setText(
+      "#sentiment",
+      state.market.sentiment.toFixed(0)
+    );
+
+    const signal =
+      state.consensus.direction;
+
+    setText(
+      "#signal",
+      signal
+    );
+
+    const signalElements =
+      $$("#signal");
+
+    signalElements.forEach((el) => {
+      if (signal === "BUY") {
+        el.style.color =
+          "var(--green)";
+      } else if (signal === "SELL") {
+        el.style.color =
+          "var(--red)";
+      } else {
+        el.style.color =
+          "var(--yellow)";
+      }
+    });
+  }
+
+  /* ======================================================
+     RENDER: POSITION
+  ====================================================== */
+
+  function renderPosition() {
+    if (!state.position.side) {
+      setText(
+        "#position",
+        "FLAT"
+      );
+
+      setText(
+        "#current-position",
+        "NO POSITION"
+      );
+
+      setText(
+        "#entry",
+        "—"
+      );
+
+      setText(
+        "#unrealized",
+        "$0.00"
+      );
+
+      return;
+    }
+
+    setText(
+      "#position",
+      state.position.side
+    );
+
+    setText(
+      "#current-position",
+      state.position.side
+    );
+
+    setText(
+      "#entry",
+      formatMoney(
+        state.position.entry
+      )
+    );
+
+    setText(
+      "#unrealized",
+      formatMoney(
+        getUnrealizedPnL()
+      )
+    );
+  }
+
+  /* ======================================================
+     RENDER: AGENTS
+  ====================================================== */
+
+  function renderAgents() {
+    $$(".agent-card").forEach((card) => {
+      const agentName =
+        card.dataset.agent;
+
+      if (!agentName) {
+        return;
+      }
+
+      const signal =
+        state.signals[agentName];
+
+      if (!signal) {
+        return;
+      }
+
+      /*
+        Look for common status elements.
+      */
+
+      const status =
+        card.querySelector(
+          ".agent-status, .status, [data-status]"
+        );
+
+      const detail =
+        card.querySelector(
+          ".agent-detail, .detail, [data-detail]"
+        );
+
+      if (status) {
+        status.textContent =
+          signal.signal;
+      }
+
+      if (detail) {
+        detail.textContent =
+          signal.reason;
+      }
+
+      /*
+        Also update any text elements that
+        explicitly contain the status.
+      */
+
+      const statusNodes =
+        card.querySelectorAll(
+          "[data-agent-status]"
+        );
+
+      statusNodes.forEach((node) => {
+        node.textContent =
+          signal.signal;
+      });
+
+      /*
+        Agent state classes.
+      */
+
+      card.classList.remove(
+        "buy",
+        "sell",
+        "hold",
+        "blocked",
+        "active"
+      );
+
+      if (
+        signal.signal === "BUY" ||
+        signal.signal === "EXECUTE BUY"
+      ) {
+        card.classList.add("buy");
+      }
+
+      if (
+        signal.signal === "SELL" ||
+        signal.signal === "EXECUTE SELL"
+      ) {
+        card.classList.add("sell");
+      }
+
+      if (
+        signal.signal === "BLOCK" ||
+        signal.signal === "LIQUIDATE"
+      ) {
+        card.classList.add("blocked");
+      }
+
+      if (
+        signal.signal === "HOLD" ||
+        signal.signal === "WAIT" ||
+        signal.signal === "CLEAR" ||
+        signal.signal === "STANDBY"
+      ) {
+        card.classList.add("hold");
+      }
+
+      card.classList.add("active");
+    });
+  }
+
+  /* ======================================================
+     RENDER: LEDGER
+  ====================================================== */
 
   function renderLedger() {
     const ledger =
@@ -1429,88 +1222,128 @@ NO REAL MONEY
       return;
     }
 
+    /*
+      Support either a table body or normal container.
+    */
+
+    const rows =
+      state.ledger
+        .slice(0, 25)
+        .map((entry) => {
+          return `
+            <div class="nexus-ledger-row"
+                 style="
+                   display:grid;
+                   grid-template-columns:
+                     70px 70px 1fr;
+                   gap:8px;
+                   padding:8px 0;
+                   border-bottom:
+                     1px solid rgba(255,255,255,.06);
+                   font-size:12px;
+                 ">
+              <span style="opacity:.6">
+                ${entry.time}
+              </span>
+
+              <strong>
+                ${entry.agent}
+              </strong>
+
+              <span>
+                <strong>
+                  ${entry.action}
+                </strong>
+                <br>
+                <span style="opacity:.65">
+                  ${entry.details}
+                </span>
+              </span>
+            </div>
+          `;
+        })
+        .join("");
+
     if (
-      !state.ledger.length
+      ledger.tagName === "TBODY"
     ) {
-      ledger.innerHTML = `
-        <div class="ledger-entry">
-          <span class="ledger-time">—</span>
-          <strong>NEXUS</strong>
-          <span>INITIALIZING</span>
-          <small>Waiting for engine...</small>
-        </div>
-      `;
+      ledger.innerHTML =
+        state.ledger
+          .slice(0, 25)
+          .map((entry) => `
+            <tr>
+              <td>${entry.time}</td>
+              <td>${entry.agent}</td>
+              <td>${entry.action}</td>
+              <td>${entry.details}</td>
+            </tr>
+          `)
+          .join("");
+    } else {
+      ledger.innerHTML = rows;
+    }
+  }
+
+  /* ======================================================
+     RENDER CYCLE
+  ====================================================== */
+
+  function renderCycle() {
+    setText(
+      "#cycle",
+      state.cycle
+    );
+  }
+
+  function render() {
+    renderStats();
+    renderMarket();
+    renderPosition();
+    renderAgents();
+    renderLedger();
+    renderCycle();
+
+    /*
+      Update pause button text.
+    */
+
+    const pause =
+      $("#pause");
+
+    if (pause) {
+      pause.textContent =
+        state.running
+          ? "PAUSE"
+          : "RESUME";
+    }
+  }
+
+  /* ======================================================
+     MANUAL CONTROLS
+  ====================================================== */
+
+  function manualTrade(direction) {
+    const gate =
+      runAgentCycle();
+
+    if (!gate.approved) {
+      addLedger(
+        "NEXUS",
+        `MANUAL ${direction} BLOCKED`,
+        gate.reason
+      );
+
+      render();
 
       return;
     }
 
-    ledger.innerHTML =
-      state.ledger
-        .map(
-          entry => `
-            <div class="ledger-entry">
+    executePaperTrade(
+      direction
+    );
 
-              <span class="ledger-time">
-                ${escapeHTML(
-                  entry.time
-                )}
-              </span>
-
-              <strong>
-                ${escapeHTML(
-                  entry.agent
-                )}
-              </strong>
-
-              <span>
-                ${escapeHTML(
-                  entry.action
-                )}
-              </span>
-
-              <small>
-                ${escapeHTML(
-                  entry.details
-                )}
-              </small>
-
-            </div>
-          `
-        )
-        .join("");
+    render();
   }
-
-  // ======================================================
-  // HTML ESCAPE
-  // ======================================================
-
-  function escapeHTML(value) {
-    return String(value)
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
-  }
-
-  // ======================================================
-  // BUTTON CONTROLS
-  // ======================================================
 
   function bindControls() {
     const buy =
@@ -1528,22 +1361,14 @@ NO REAL MONEY
     if (buy) {
       buy.addEventListener(
         "click",
-        () => {
-          executeManualTrade(
-            "BUY"
-          );
-        }
+        () => manualTrade("BUY")
       );
     }
 
     if (sell) {
       sell.addEventListener(
         "click",
-        () => {
-          executeManualTrade(
-            "SELL"
-          );
-        }
+        () => manualTrade("SELL")
       );
     }
 
@@ -1551,22 +1376,8 @@ NO REAL MONEY
       close.addEventListener(
         "click",
         () => {
-          if (
-            state.position.side
-          ) {
-            closePosition(
-              "MARIN",
-              "MANUAL CLOSE"
-            );
-
-            render();
-          } else {
-            addLedger(
-              "MARIN",
-              "NO POSITION",
-              "Nothing available to close."
-            );
-          }
+          closePosition("MANUAL CLOSE");
+          render();
         }
       );
     }
@@ -1575,119 +1386,53 @@ NO REAL MONEY
       pause.addEventListener(
         "click",
         () => {
-          state.system.running =
-            !state.system.running;
-
-          pause.textContent =
-            state.system.running
-              ? "PAUSE"
-              : "RESUME";
+          state.running =
+            !state.running;
 
           addLedger(
             "NEXUS",
-            state.system.running
-              ? "ENGINE RESUMED"
-              : "ENGINE PAUSED",
-            state.system.running
-              ? "Automatic trading cycle resumed."
-              : "Automatic trading cycle paused."
+            state.running
+              ? "SYSTEM RESUMED"
+              : "SYSTEM PAUSED",
+            state.running
+              ? "Automatic cycles resumed"
+              : "Automatic trading cycles paused"
           );
+
+          render();
         }
       );
     }
   }
 
-  // ======================================================
-  // MANUAL PAPER TRADE
-  // ======================================================
-
-  function executeManualTrade(
-    direction
-  ) {
-    if (
-      state.market.price <= 0
-    ) {
-      initializeMarket();
-    }
-
-    /*
-      Manual controls intentionally use
-      the same consensus/risk architecture.
-    */
-
-    if (
-      state.consensus <
-      CONFIG.consensusRequired
-    ) {
-      addLedger(
-        "VESKA",
-        "MANUAL BLOCK",
-        `Consensus ${state.consensus.toFixed(
-          1
-        )}% below ${CONFIG.consensusRequired}%`
-      );
-
-      return;
-    }
-
-    const approved =
-      riskGate();
-
-    if (!approved) {
-      render();
-      return;
-    }
-
-    executePaperTrade(
-      direction,
-      "VESKA"
-    );
-
-    render();
-  }
-
-  // ======================================================
-  // SYSTEM BOOT
-  // ======================================================
+  /* ======================================================
+     STARTUP
+  ====================================================== */
 
   function boot() {
-    initializeMarket();
+    /*
+      Initial agent pass.
+    */
 
-    render();
-
-    bindControls();
+    runAgentCycle();
 
     addLedger(
       "NEXUS",
       "SYSTEM ONLINE",
-      "8-agent paper trading command center initialized."
+      "8-agent paper trading command center initialized"
     );
 
     addLedger(
-      "TIDAL",
-      "MARKET STREAM",
-      `BTC initialized at ${formatPrice(
-        state.market.price
-      )}`
-    );
-
-    addLedger(
-      "RUNE",
-      "RISK GATE",
-      `Consensus threshold set to ${CONFIG.consensusRequired}%.`
+      "NEXUS",
+      "PAPER MODE",
+      "No broker connection / no real money"
     );
 
     render();
 
     /*
-      First real cycle shortly after boot,
-      then continue automatically.
+      Automatic trading cycle.
     */
-
-    setTimeout(
-      tradingCycle,
-      1200
-    );
 
     setInterval(
       tradingCycle,
@@ -1695,38 +1440,11 @@ NO REAL MONEY
     );
   }
 
-  // ======================================================
-  // MASTER RENDER
-  // ======================================================
+  /* ======================================================
+     START
+  ====================================================== */
 
-  function render() {
-    calculateUnrealizedPnl();
-
-    renderStats();
-
-    renderMarket();
-
-    renderAgents();
-
-    renderPosition();
-
-    renderLedger();
-  }
-
-  // ======================================================
-  // START
-  // ======================================================
-
-  if (
-    document.readyState ===
-    "loading"
-  ) {
-    document.addEventListener(
-      "DOMContentLoaded",
-      boot
-    );
-  } else {
-    boot();
-  }
+  bindControls();
+  boot();
 
 })();
